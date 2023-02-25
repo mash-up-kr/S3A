@@ -5,7 +5,7 @@
 <table>
   <tr>
     <td align="center"><a href="https://github.com/K-Diger"><img src="https://avatars.githubusercontent.com/u/60564431?v=4" width="100px;" alt=""/><br /><sub><b>김도현</b></sub></a><br />💻</a></td>
-    <td align="center"><a href="https://github.com/jongnan"><img src="https://user-images.githubusercontent.com/69254943/221334018-0e720dc8-fe6b-419f-809b-43e297c62446.png" width="100px;" alt=""/><br /><sub><b>김종윤</b></sub></a><br />💻</a></td>
+    <td align="center"><a href="https://github.com/jongnan"><img src="https://user-images.githubusercontent.com/26344479/221334352-f27c65cf-f099-4f93-9534-55983f393223.png" width="100px;" alt=""/><br /><sub><b>김종윤</b></sub></a><br />💻</a></td>
     <td align="center"><a href="https://github.com/KJongHyun"><img src="https://user-images.githubusercontent.com/69254943/221334018-0e720dc8-fe6b-419f-809b-43e297c62446.png" width="100px;" alt=""/><br /><sub><b>김종현</b></sub></a><br />💻</a></td>
     <td align="center"><a href="https://github.com/sw-develop"><img src="https://user-images.githubusercontent.com/69254943/221334018-0e720dc8-fe6b-419f-809b-43e297c62446.png" width="100px;" alt=""/><br /><sub><b>박세원</b></sub></a><br /><a href="https://github.com/AUSG/Relay-Homepage/commits?author=whitesoil" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/hocaron"><img src="https://user-images.githubusercontent.com/69254943/221334018-0e720dc8-fe6b-419f-809b-43e297c62446.png" width="100px;" alt=""/><br /><sub><b>호선우</b></sub></a><br /><a href="https://github.com/AUSG/Relay-Homepage/commits?author=rayleighko" title="Code">💻</a></td>
