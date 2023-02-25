@@ -5,7 +5,7 @@
 <table>
   <tr>
     <td align="center"><a href="https://github.com/xonmin"><img src="https://avatars.githubusercontent.com/u/27190617?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Xonmin</b></sub></a><br />💪</a></td>
-    <td align="center"><a href="https://github.com/KimDoubleB"><img src="" width="100px;" alt=""/><br /><sub><b>바다의 보배</b></sub></a><br />💻</a></td>
+    <td align="center"><a href="https://github.com/KimDoubleB"><img src="https://user-images.githubusercontent.com/37873745/221325093-bc9896e6-86a1-4ffe-9144-3ca6b1c03fbc.jpeg" width="100px;" alt=""/><br /><sub><b>바다의 보배</b></sub></a><br />💻</a></td>
     <td align="center"><a href="https://github.com/god9599"><img src="https://avatars.githubusercontent.com/u/59276134?v=4?s=100" width="100px;" alt=""/><br /><sub><b>God</b></sub></a><br />💻</a></td>
     <td align="center"><a href="https://github.com/mkSpace"><img src="https://cdn.discordapp.com/attachments/977459923594129468/1078311218059673650/image.png" width="100px;" alt=""/><br /><sub><b>Mr. Black</b></sub></a><br />💻</a></td>
     <td align="center"><a href="https://github.com/yaeoni"><img src="https://yt3.googleusercontent.com/AUJYV5Isvijta-MSG8E6VodHV9zGumDO8vprOZsi7Y2PmIvjSGy_Qz-m8kU5s8LYuzsU73-4pA=s900-c-k-c0x00ffffff-no-rj" width="100px;" alt=""/><br /><sub><b>예옹</b></sub></a><br /><a href="https://github.com/AUSG/Relay-Homepage/commits?author=whitesoil" title="Code">💻</a></td>
