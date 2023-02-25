@@ -5,7 +5,7 @@
 <table>
   <tr>
     <td align="center"><a href="https://github.com/K-Diger"><img src="https://avatars.githubusercontent.com/u/60564431?v=4" width="100px;" alt=""/><br /><sub><b>김도현</b></sub></a><br />💻</a></td>
-    <td align="center"><a href="https://github.com/jongnan"><img src="https://user-images.githubusercontent.com/26344479/221334352-f27c65cf-f099-4f93-9534-55983f393223.png" width="100px;" alt=""/><br /><sub><b>김종윤</b></sub></a><br />💻</a></td>
+    <td align="center"><a href="https://github.com/jongnan"><img src="https://user-images.githubusercontent.com/69254943/221334018-0e720dc8-fe6b-419f-809b-43e297c62446.png" width="100px;" alt=""/><br /><sub><b>김종윤</b></sub></a><br />💻</a></td>
     <td align="center"><a href="https://github.com/KJongHyun"><img src="https://user-images.githubusercontent.com/69254943/221334018-0e720dc8-fe6b-419f-809b-43e297c62446.png" width="100px;" alt=""/><br /><sub><b>김종현</b></sub></a><br />💻</a></td>
     <td align="center"><a href="https://github.com/sw-develop"><img src="https://user-images.githubusercontent.com/69254943/221334018-0e720dc8-fe6b-419f-809b-43e297c62446.png" width="100px;" alt=""/><br /><sub><b>박세원</b></sub></a><br /><a href="https://github.com/AUSG/Relay-Homepage/commits?author=whitesoil" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/hocaron"><img src="https://user-images.githubusercontent.com/69254943/221334018-0e720dc8-fe6b-419f-809b-43e297c62446.png" width="100px;" alt=""/><br /><sub><b>호선우</b></sub></a><br /><a href="https://github.com/AUSG/Relay-Homepage/commits?author=rayleighko" title="Code">💻</a></td>
@@ -36,13 +36,13 @@
 
 |주|날짜|토픽|과제|MVP|
 |:----:|:----:|:-----:|:-----:|:----:|
-|0번째 주|2023.02.25|Orientation|README 추가||
-|1번째 주|2023.03.02|1장 ~ 2장 (~32p)|
-|2번째 주|2023.03.09|3장 ~ 4장 (~62p)|
-|3번째 주|2023.03.16|5장 ~ 6장 (~104p)|
-|4번째 주|2023.03.23|7장 ~ 8장 (~148p)|
-|5번째 주|2023.03.30|9장 ~ 10장 (~179p)|
-|6번째 주|2023.04.06|11장 ~ 12장 (~211p)|
-|7번째 주|2023.04.13|13장 ~ 14장 (~243p)|
-|8번째 주|2023.04.20|15장 ~ 16장 (~276p)|
-|9번째 주|2021.04.27|책걸이|쐬주 한잔 하기|
+|1번째 주|2023.03.02|1장 p.53 ~ p.144|
+|2번째 주|2023.03.09|2장 p.145 ~ p.208|
+|3번째 주|2023.03.16|3장 p.209 ~ p.278|
+|4번째 주|2023.03.23|4장 p.279 ~ p.316|
+|5번째 주|2023.03.30|5장 p.317 ~ p.400|
+|6번째 주|2023.04.06|6장 p.401 ~ p.556|
+|7번째 주|2023.04.13|7장 p.557 ~ p.712|
+|8번째 주|2023.04.20|8장 p.713 ~ p.752|
+|9번째 주|2023.04.27|9장 p.753 ~ p.828|
+|10번째 주|2023.04.27|책걸기|쐬주 한잔 하기|
