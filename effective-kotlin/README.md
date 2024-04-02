@@ -12,7 +12,7 @@
 
 ### 정복할 책
 > Effective Kotlin
-> <img src=https://github.com/mash-up-kr/S3A/assets/63635886/65c65ca0-c784-4286-9883-f407caa6d6a3>
+<img src=https://github.com/mash-up-kr/S3A/assets/63635886/65c65ca0-c784-4286-9883-f407caa6d6a3>
 
 ### 진행 기간
 > - 2024년 04월부터 6월까지 진행
