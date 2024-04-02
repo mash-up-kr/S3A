@@ -13,7 +13,20 @@
   - 진행 방식 
   - ground rules 
   - ... 
-- 최상위 `README.md` 에 신규 스터디 ref 추가 
+- 최상위 `README.md` 에 신규 스터디 ref 추가
+
+---
+
+## 14th Spring Team
+
+### Effective Kotlin
+- 멤버 : [한정민](https://github.com/xonmin), [김보배](https://github.com/KimDoubleB), [오예원](https://github.com/yaeoni), [박범근](https://github.com/bbeomgeun)
+
+### Kafka
+- 멤버 : 
+
+### Optimizing Java
+- 멤버 : 
 
 --- 
 ## 13th Spring Team 
