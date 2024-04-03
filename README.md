@@ -23,7 +23,7 @@
 - 멤버 : [한정민](https://github.com/xonmin), [김보배](https://github.com/KimDoubleB), [오예원](https://github.com/yaeoni), [박범근](https://github.com/bbeomgeun)
 
 ### Kafka
-- 멤버 : 
+- 멤버 : [박재민](https://github.com/mkSpace), [주성민](https://github.com/god9599), [김소현](), [임준형](https://github.com/toychip), [김도현](https://github.com/K-Diger), [호선우](https://github.com/hocaron)
 
 ### Optimizing Java
 - 멤버 : 
