@@ -18,10 +18,6 @@
 * 종료 날짜: 2024.06.??
 * 스터디 시간: 매 주 화요일 20:00 ~ 00:00
 
-### 진행 방식
-
-1. TBA
-
 ### Our Ground Rules
 
 - [13th DDD 스터디 방식 그대로 갑니다.](https://github.com/mash-up-kr/S3A/tree/master/13th_DDD#%EC%A7%84%ED%96%89-%EC%8B%9C%EA%B0%84)
