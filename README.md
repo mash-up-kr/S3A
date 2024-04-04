@@ -31,9 +31,9 @@
 --- 
 ## 13th Spring Team 
 
-### [DDD](https://github.com/mash-up-kr/S3A/tree/master/DDD)
+### [DDD](https://github.com/mash-up-kr/S3A/tree/master/13th_DDD)
 - 멤버 : [한정민](https://github.com/xonmin), [김보배](https://github.com/KimDoubleB), [주성민](https://github.com/god9599), [박재민](https://github.com/mkSpace), [오예원](https://github.com/yaeoni), [황성찬](https://github.com/plzprayme)
-### [Kafka](https://github.com/mash-up-kr/S3A/tree/master/kafka)
+### [Kafka](https://github.com/mash-up-kr/S3A/tree/master/13th_kafka)
 - 멤버 : [김경환](https://github.com/kh0712), [김보규](https://github.com/bohub12), [김성윤](https://github.com/SeongYunKim), [정종민](https://github.com/alertjjm), [이정원](https://github.com/lee-garden), [최정균](https://github.com/wjdrbs96)
-### [toby-spring](https://github.com/mash-up-kr/S3A/tree/master/toby-spring)
+### [toby-spring](https://github.com/mash-up-kr/S3A/tree/master/13th_toby-spring)
 - 멤버 : [김도현](https://github.com/K-Diger), [김종윤](https://github.com/jongnan), [김종현](https://github.com/KJongHyun), [박세원](https://github.com/sw-develop), [호선우](https://github.com/hocaron)
