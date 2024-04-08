@@ -26,7 +26,7 @@
 - 멤버 : [박재민](https://github.com/mkSpace), [주성민](https://github.com/god9599), [김소현](), [임준형](https://github.com/toychip), [김도현](https://github.com/K-Diger), [호선우](https://github.com/hocaron)
 
 ### Optimizing Java
-- 멤버 : 
+- 멤버 : [김경환](https://github.com/kh0712), [박세원](https://github.com/wonlog-g), [이원영](https://github.com/210-reverof), [정종민](https://github.com/alertjjm)
 
 --- 
 ## 13th Spring Team 
