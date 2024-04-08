@@ -2,7 +2,7 @@
 
 카프카는 데이터를 받아서 전달하는 데이터 버스 역할을 한다.
 
-![카프카 기본 구성](https://github.com/mash-up-kr/S3A/blob/14th_kafka/dohyeon/14th_kafka/dohyeon/1.png?raw=true)
+![카프카 기본 구성](https://github.com/mash-up-kr/S3A/blob/14th_kafka/dohyeon/14th_kafka/dohyeon/image/1.png?raw=true)
 
 프로듀서, 컨슈머, 카프카(브로커)가 기본 구성요소이며 이 세 가지 컴포넌트들의 정상 동작을 보장하기 위해 메타데이터를 관리하는 코디네이터인 `주키퍼`가 있다.
 
