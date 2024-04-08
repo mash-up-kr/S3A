@@ -4,7 +4,7 @@
 
 <table>
     <td align="center"><a href="https://github.com/kh0712"><img src="https://github.com/kh0712.png" width="100px;" alt=""/><br /><sub><b>김경환</b></sub></a><br />💻</a></td>
-    <td align="center"><a href="hhttps://github.com/wonlog-g"><img src="https://github.com/wonlog-g.png" width="100px;" alt=""/><br /><sub><b>박세원</b></sub></a><br />💻</a></td>
+    <td align="center"><a href="https://github.com/wonlog-g"><img src="https://github.com/wonlog-g.png" width="100px;" alt=""/><br /><sub><b>박세원</b></sub></a><br />💻</a></td>
     <td align="center"><a href="https://github.com/210-reverof"><img src="https://github.com/210-reverof.png" width="100px;" alt=""/><br /><sub><b>이원영</b></sub></a><br />💻</a></td>
     <td align="center"><a href="https://github.com/alertjjm"><img src="https://github.com/alertjjm.png" width="100px;" alt=""/><br /><sub><b>정종민</b></sub></a><br />💻</a></td>
   </tr>
