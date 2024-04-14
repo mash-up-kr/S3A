@@ -1,29 +1,27 @@
 # Quiz
 
-
-
 # 1. 카프카 기초 다지기
 
 ## 1.0 용어 정리
 
-- ### `주키퍼`
-  - 카프카의 메타데이터 관리/브로커의 상태 점검을 담당한다.
-- ### `카프카/카프카 클러스터`
-  - 여러 대의 브로커를 구성한 클러스터를 말한다.
-- ### `브로커`
-  - 카프카 애플리케이션이 설치된 서버/노드를 말한다.
-- ### `프로듀서`
-  - 카프카로 메세지를 보내는 클라이언트이다.
-- ### `컨슈머`
-  - 카프카에서 메세지를 꺼내는 클라이언트이다.
-- ### `토픽`
-  - 카프카는 메세지 피드들을 토픽으로 구분한다. 각 토픽의 이름은 카프카 내에서 고유하다.
-- ### `파티션`
-  - 병렬 처리를 위해 하나의 토픽을 여러 개로 나눈 것을 말한다.
-- ### `세그먼트`
-  - 프로듀서가 전송한 실제 메세지가 브로커의 로컬 디스크에 저장되는 파일을 말한다.
-- ### `메세지, 레코드`
-  - 프로듀서가 브로커로 전송하거나 컨슈머가 읽어가는 데이터 조각을 말한다.
+- `주키퍼`
+    - 카프카의 메타데이터 관리/브로커의 상태 점검을 담당한다.
+- `카프카/카프카 클러스터`
+    - 여러 대의 브로커를 구성한 클러스터를 말한다.
+- `브로커`
+    - 카프카 애플리케이션이 설치된 서버/노드를 말한다.
+- `프로듀서`
+    - 카프카로 메세지를 보내는 클라이언트이다.
+- `컨슈머`
+    - 카프카에서 메세지를 꺼내는 클라이언트이다.
+- `토픽`
+    - 카프카는 메세지 피드들을 토픽으로 구분한다. 각 토픽의 이름은 카프카 내에서 고유하다.
+- `파티션`
+    - 병렬 처리를 위해 하나의 토픽을 여러 개로 나눈 것을 말한다.
+- `세그먼트`
+    - 프로듀서가 전송한 실제 메세지가 브로커의 로컬 디스크에 저장되는 파일을 말한다.
+- `메세지, 레코드`
+    - 프로듀서가 브로커로 전송하거나 컨슈머가 읽어가는 데이터 조각을 말한다.
 
 ---
 
@@ -96,12 +94,14 @@
 
 [배치 전송 옵션](https://magpienote.tistory.com/251)
 
-- Kafka는 메세지를 보낼 때 ACK 로직을 타게 돼는데 메세지당 한 번의 ACK로직이 발생한다.
-- Producer가 보내는 메세지의 량이 많아지게 돼면 메세지 처리 속도가 늦어져 Lag이 걸리는 latency가 발생한다.
-- 이를 해결하기 위한 Producer의 방식은 Batch 처리를 이용한다. batch를 이용하면 메세지를 묶음 으로 보내기 때문에 replica처리 로직이 줄어들어 Latency를 방지 할 수 있다. 즉, 메세지 send 처리가 대기 줄일 수 있다.
-- batch 설정 옵션은 `batch.size`와 `linger.ms`이 있다. 
-  - `batch.size(default 16kb)` : size를 정의 하여 메세지의 용량이 size에 도달 할 때 까지 기다렸다가 보낸다.
-  - `linger.ms(default 0)` : batch.size가 도달하지 않으면 메세지를 보내지 않기 때문에 마냥 기다릴 수는 없어 해당 시간을 설정하여 size가 도달하지 않더라도 시간이 초과하면 메세지를 보내게 된다.
+- Kafka는 메세지를 보낼 때 ACK 로직을 거치는데 메세지당 한 번의 ACK로직이 발생한다.
+- Producer가 보내는 메세지양이 많아지면 처리 속도가 늦어져 Lag이 걸리는 latency가 발생한다.
+- 이를 해결하기 위한 Producer의 방식은 Batch 처리를 이용한다. batch를 이용하면 메세지를 묶음 으로 보내기 때문에 replica처리 로직이 줄어들어 Latency를 방지 할 수 있다. 즉, 메세지
+  send 처리가 대기 줄일 수 있다.
+- batch 설정 옵션은 `batch.size`와 `linger.ms`이 있다.
+    - `batch.size(default 16kb)` : size를 정의 하여 메세지의 용량이 size에 도달 할 때 까지 기다렸다가 보낸다.
+    - `linger.ms(default 0)` : batch.size가 도달하지 않으면 메세지를 보내지 않기 때문에 마냥 기다릴 수는 없어 해당 시간을 설정하여 size가 도달하지 않더라도 시간이 초과하면
+      메세지를 보내게 된다.
 
 ## 2.4 압축 전송
 
@@ -169,8 +169,8 @@ Znode를 이용해 카프카의 메타 정보가 주키퍼에 기록되며, 주�
 2. 직렬화를 수행한다.
 3. 파티셔너가 레코드를 통해 파티션을 확인하고 명시한 파티션이 없다면 라운드 로빈으로 파티션을 선택하여 저장한다.
 4. 레코드들은 파티션별로 모이게 되는데, 프로듀서가 카프카로 전송하기 전 배치 전송을 하기 위함이다.
-5. 브로커에 메세지를 전송한다. 
-   6. 이 과정이 실패 시 재시도한다.
+5. 브로커에 메세지를 전송한다.
+    6. 이 과정이 실패 시 재시도한다.
 
 `ProducerRecord`는 카프카로 전송하기 위한 실제 데이터이며 구성요소는 아래와 같다.
 
@@ -186,46 +186,57 @@ Znode를 이용해 카프카의 메타 정보가 주키퍼에 기록되며, 주�
 메세지 손실, 메세지 전송 속도를 조정해야할 경우 아래 주요 옵션을 조절해야할 필요가 있다.
 
 ### `bootstrap.servers`
+
 - 클라이언트가 카프카 클러스터에 처음 연결하기 위한 `호스트`, `포트` 정보를 나타낸다.
 - 클러스터 내 모든 서버가 클라이언트의 요청을 받을 수 있으므로 처음 누가 받을지를 정하는 것이다.
 
 ### `client.dns.lookup`
+
 - 하나의 호스트에 여러 IP를 매핑 사용하는 환경에서 하나의 IP에 연결하지 못할경우 다른 IP로 시도하는 설정이다.
 - 이 값은 기본값으로 DNS에 할당된 모든 IP를 저장하여 다음 IP로 접근할 수 있또록 한다.
 
 ### `acks`
+
 - 전송 보장 옵션으로, 프로듀서가 카프카 토픽 리더에 메세지를 전송한 후 카프카 생태계에 도착 여부를 확인할 것인지를 결정하는 옵션이다.
 - `0` : 프로듀서는 메세지를 보내면 확인 응답을 받지 않는다. (속도 GOOD, 안정성 BAD)
 - `1` : 리더가 메세지를 받았는지 확인하지만 모든 팔로워를 전부 확인하지 않는다. (속도 NOT BAD, 안정성 NOT BAD)
 - `-1` : 팔로워가 전부 메세지를 받았는지 확인한다. 팔로워가 하나라도 있으면 메세지는 손실되지 않는다. (속도 BAD, 안정성 GOOD)
 
 ### `buffer.memory`
+
 - 프로듀서가 카프카 서버로 데이터를 보낼 때 잠시 대기할 수 있는 전체 메모리이다. 단위는 byte이다.
 - 배치 전송, 딜레이 등에 의해 사용되는 공간이다.
 
 ### `compression.type`
+
 - 프로듀서가 메세지 전송 시 선택할 수 있는 압축 타입이다.
 - `none`, `gzip`, `snappy`, `lz4`, `zstd` 중 원하는 타입을 선택할 수 있다.
 
 ### `enable.idempotence`
-- 이 설정을 `true`로 하면 `중복 없는 전송`이 가능하다. 
+
+- 이 설정을 `true`로 하면 `중복 없는 전송`이 가능하다.
 - 이 설정을 사용하기 위해선 `max.in.flight.requests.per.connection`옵션 값은 5이하, `retries`옵션 값은 0 이상, `acks`는 -1로 설정해야한다.
 
 ### `max.in.flight.requests.per.connection`
+
 - 하나의 커넥션에서 프로듀서가 ACK없이 전송할 수 있는 최대 요청 수 이다.
 - 메세지의 순서가 중요하다면 1로 설정할 것을 권장하지만 성능이 떨어진다.
 
 ### `retries`
+
 - 전송에 실패한 데이터를 다시 보내는 횟수이다.
 
 ### `batch.size`
+
 - 동일한 파티션으로 보내는 여러 데이터를 배치로 보내도록한다. 적절하게 배치 크기를 설정하면 성능에 도움을 준다.
 
 ### `linger.ms`
+
 - 배치 형태의 메세지를 보내기 전에 추가적인 메세를 기다리는 시간을 조정할 수 있는 옵션이다.
 - 배츠 크기에 도달하지 못했을 때 `linger.ms` 제한시간에 도달했을 때 메세지를 전송한다.
 
 ### `transactional.id`
+
 - `정확히 한 번 전송`을 위해 사용하는 옵션이다.
 - 동일한 TransactionalId에 한해 정확히 한 번을 보장한다.
 - 옵션을 사용하기 전 `enable.idempotence`를 true로 설정해야한다.
@@ -238,7 +249,8 @@ Znode를 이용해 카프카의 메타 정보가 주키퍼에 기록되며, 주�
 
 ### 3.3.1 메세지를 보내고 확인하지 않기
 
-아래 코드는 메세지를 보내고 확인하지 않는 전송 방식의 예시이다. `send()`메서드를 사용해 메세지를 전송한 후 `Future`객체로 RecordMetadata를 리턴받지만 리턴값을 무시하므로 메세지가 성공적으로 전송됐는지 알 수 없다.
+아래 코드는 메세지를 보내고 확인하지 않는 전송 방식의 예시이다. `send()`메서드를 사용해 메세지를 전송한 후 `Future`객체로 RecordMetadata를 리턴받지만 리턴값을 무시하므로 메세지가 성공적으로
+전송됐는지 알 수 없다.
 
 카프카 브로커에 메세지를 전송한 후의 에러는 무시하지만 전송 전에 에러가 발생하면 이에 대한 예외는 처리할 수 있다.
 
@@ -247,7 +259,7 @@ public class ProducerFireForgot {
   public static void main(String[] args) {
     KafkaProducer<String, String> producer = new KafkaProducer<>(props);
     // ++ 기타 카프카 셋팅
-    
+
     producer.send(record);
   }
 }
@@ -264,7 +276,7 @@ public class ProducerSync {
   public static void main(String[] args) {
     KafkaProducer<String, String> producer = new KafkaProducer<>(props);
     // ++ 기타 카프카 셋팅
-    
+
     Producer producer = new Producer();
     RecordMetadata recordMetadata = producer.send(record).get();
     System.out.println(recordMetadata.topic());
@@ -287,16 +299,16 @@ public class ProducerAsync {
   public static void main(String[] args) {
     KafkaProducer<String, String> producer = new KafkaProducer<>(props);
     // ++ 기타 카프카 셋팅
-    
+
     producer.send(record, new DigerProducerCallback(record));
   }
 }
 
 public class DigerProducerCallback implements CallBack {
   private ProducerRecord<String, String> record;
-  
+
   // 생성자
-  
+
   @Override
   public void onCompletion(RecordMetadata recordMetadata, Exception e) {
     if (e != null) {
@@ -328,7 +340,7 @@ public class DigerProducerCallback implements CallBack {
 
 `하나의 컨슈머 그룹 내의 컨슈머 수`와 파티션 수는 `1:1`로 매핑되는 것이 이상적이다. (즉, 파티션이 5개라면 컨슈머 그룹 내의 컨슈머는 5개)
 
-파티션 수보다 컨슈머 수가 많으면 더 많은 수의 컨슈머들이 대기 상태로만 존재하기 때문에 리소스 낭비가 발생하게 된다. 
+파티션 수보다 컨슈머 수가 많으면 더 많은 수의 컨슈머들이 대기 상태로만 존재하기 때문에 리소스 낭비가 발생하게 된다.
 
 만약 컨슈머가 장애가 발생하는 것을 대비하여 초과하여 두는 것이라면 `컨슈머 그룹`내의 `리밸런싱` 동작을 통해 **다른 컨슈머가 그 동작을 대신 수행**하므로 추가적인 리소스를 소비할 필요가 없다.
 
@@ -337,50 +349,63 @@ public class DigerProducerCallback implements CallBack {
 ## 4.2 컨슈머 주요 옵션
 
 ### `bootstrap.servers`
+
 - 클라이언트가 카프카 클러스터에 처음 연결하기 위한 `호스트`, `포트` 정보를 나타낸다.
 - 클러스터 내 모든 서버가 클라이언트의 요청을 받을 수 있으므로 처음 누가 받을지를 정하는 것이다.
 
 ### `fetch.min.bytes`
+
 - 한 번에 가져올 수 있는 최소 데이터 크기이다.
 - 지정한 크기보다 작은 경우, 요청에 응답하지 않고 데이터가 누적될 때까지 기다린다.
 
 ### `group.id`
+
 - 컨슈머가 속한 컨슈머 그룹을 식별하는 식별자이다.
 - 동일한 그룹 내의 컨슈머 정보는 상호 공유된다.
 
 ### `heartbeart.interval.ms`
+
 - 하트비트가 있다는 것은 컨슈머의 상태가 active임을 의미한다.
 - `session.timeout.ms`와 관계가 있어 `session.timeout.ms보다 낮은 값`으로 설정해야한다.
 
 ### `max.partition.fetch.bytes`
+
 - 파티션당 가져올 수 있는 최대 크기를 의미한다.
 
 ### `session.timeout.ms`
+
 - 이 시간으로 컨슈머가 종료된 것인지 판단한다.
 - 컨슈머는 주기적으로 하트비트를 보내야한다.
-  - 컨슈머가 종료된 것으로 판단되면 리밸런싱을 시작한다.
+    - 컨슈머가 종료된 것으로 판단되면 리밸런싱을 시작한다.
 
 ### `enable.auto.commit`
+
 - 백그라운드로 주기적으로 오프셋을 커밋한다.
 
 ### `fetch.max.bytes`
+
 - 한 번의 fetch로 가져올 수 있는 최대 크기이다.
 
 ### `group.instance.id`
+
 - 컨슈머의 고유한 식별자이다.
 - 이 옵션을 설정하면 static멤버로 간주되어 불필요한 리밸런싱을 수행하지 않게 된다.
 
 ### `isolation.level`
+
 - 트랜잭션 컨슈머에서 사용되는 옵션이다.
 - 기본값인 `read_uncommitted`는 으로 모든 메세지를 읽고, `read_comitted`는 트랜잭션이 완료된 메세지만 읽는다.
 
 ### `max.poll.records`
+
 - 한 번의 poll()요청으로 가져오는 최대 메세지의 수를 지정한다.
 
 ### `partition.assignment.strategy`
+
 - 파티션 할당 전략으로 기본값은 range이다.
 
 ### `fetch.max.wait.mx`
+
 - 가져오려는 데이터의 크기가 `fetch.min.bytes`에 의해 설정된 크기보다 작을 때, 요청에 대한 응답을 기다리는 최대 시간이다.
 
 ---
@@ -403,17 +428,17 @@ public class ProducerSync {
   public static void main(String[] args) {
     // 오토 커밋 설정
     props.put("enable.auto.commit", "true");
-    
+
     KafkConsumer<String, String> consumer = new KafkaConsumer<>(props);
     consumer.subscribe(Arrays.asList("Topic-Name01"));
     // ++ 기타 카프카 셋팅
 
     ConsumerRecords<String, String> records = consumer.poll(1000);
-    
-    for-loop {
+
+    for -loop {
       System.out.println(record.topic());
       System.out.println(record.partition());
-      System.out.println(record.offset());  
+      System.out.println(record.offset());
     }
   }
 }
@@ -437,8 +462,8 @@ public class ProducerSync {
     // ++ 기타 카프카 셋팅
 
     ConsumerRecords<String, String> records = consumer.poll(1000);
-    
-    for-loop {
+
+    for -loop {
       System.out.println(record.topic());
       System.out.println(record.partition());
       System.out.println(record.offset());
@@ -469,8 +494,8 @@ public class ProducerSync {
     // ++ 기타 카프카 셋팅
 
     ConsumerRecords<String, String> records = consumer.poll(1000);
-    
-    for-loop {
+
+    for -loop {
       System.out.println(record.topic());
       System.out.println(record.partition());
       System.out.println(record.offset());
@@ -484,6 +509,6 @@ public class ProducerSync {
 
 ![img.png](https://github.com/mash-up-kr/S3A/blob/master/14th_kafka/dohyeon/image/4_1.jpeg?raw=true)
 
-컨슈머들은 토픽의 파티션과 1:1로 매핑되어 메세지를 가져온다. 
+컨슈머들은 토픽의 파티션과 1:1로 매핑되어 메세지를 가져온다.
 
 만약 `컨슈머 01`이 문제가 생겨 `종료`되었다면 `컨슈머 02`, 혹은 `컨슈머 03`은 컨슈머 01 ₩대신 파티션 0을 컨슘한다.
