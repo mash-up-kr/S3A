@@ -234,7 +234,7 @@ Znode를 이용해 카프카의 메타 정보가 주키퍼에 기록되며, 주�
 
 ## 3.3 프로듀서 예제
 
-프로듀서의 전송 방식은 크게 `메세지를 보내고 확인하지 않기`, `동기 전송`, `비동기 전송`으로 구분된다.
+프로듀서는 `메세지를 보내고 확인하지 않기`, `동기 전송`, `비동기 전송`으로 전송할 수 있고 각각 처리량과 데이터 손실의 Trade-Off를 가지고 있다.
 
 ### 3.3.1 메세지를 보내고 확인하지 않기
 
@@ -245,7 +245,7 @@ Znode를 이용해 카프카의 메타 정보가 주키퍼에 기록되며, 주�
 ```java
 public class ProducerFireForgot {
   public static void main(String[] args) {
-    Producer producer = new Producer();
+    KafkaProducer<String, String> producer = new KafkaProducer<>(props);
     // ++ 기타 카프카 셋팅
     
     producer.send(record);
@@ -262,7 +262,7 @@ public class ProducerFireForgot {
 ```java
 public class ProducerSync {
   public static void main(String[] args) {
-    Producer producer = new Producer();
+    KafkaProducer<String, String> producer = new KafkaProducer<>(props);
     // ++ 기타 카프카 셋팅
     
     Producer producer = new Producer();
@@ -285,7 +285,7 @@ public class ProducerSync {
 ```java
 public class ProducerAsync {
   public static void main(String[] args) {
-    Producer producer = new Producer();
+    KafkaProducer<String, String> producer = new KafkaProducer<>(props);
     // ++ 기타 카프카 셋팅
     
     producer.send(record, new DigerProducerCallback(record));
@@ -336,3 +336,154 @@ public class DigerProducerCallback implements CallBack {
 
 ## 4.2 컨슈머 주요 옵션
 
+### `bootstrap.servers`
+- 클라이언트가 카프카 클러스터에 처음 연결하기 위한 `호스트`, `포트` 정보를 나타낸다.
+- 클러스터 내 모든 서버가 클라이언트의 요청을 받을 수 있으므로 처음 누가 받을지를 정하는 것이다.
+
+### `fetch.min.bytes`
+- 한 번에 가져올 수 있는 최소 데이터 크기이다.
+- 지정한 크기보다 작은 경우, 요청에 응답하지 않고 데이터가 누적될 때까지 기다린다.
+
+### `group.id`
+- 컨슈머가 속한 컨슈머 그룹을 식별하는 식별자이다.
+- 동일한 그룹 내의 컨슈머 정보는 상호 공유된다.
+
+### `heartbeart.interval.ms`
+- 하트비트가 있다는 것은 컨슈머의 상태가 active임을 의미한다.
+- `session.timeout.ms`와 관계가 있어 `session.timeout.ms보다 낮은 값`으로 설정해야한다.
+
+### `max.partition.fetch.bytes`
+- 파티션당 가져올 수 있는 최대 크기를 의미한다.
+
+### `session.timeout.ms`
+- 이 시간으로 컨슈머가 종료된 것인지 판단한다.
+- 컨슈머는 주기적으로 하트비트를 보내야한다.
+  - 컨슈머가 종료된 것으로 판단되면 리밸런싱을 시작한다.
+
+### `enable.auto.commit`
+- 백그라운드로 주기적으로 오프셋을 커밋한다.
+
+### `fetch.max.bytes`
+- 한 번의 fetch로 가져올 수 있는 최대 크기이다.
+
+### `group.instance.id`
+- 컨슈머의 고유한 식별자이다.
+- 이 옵션을 설정하면 static멤버로 간주되어 불필요한 리밸런싱을 수행하지 않게 된다.
+
+### `isolation.level`
+- 트랜잭션 컨슈머에서 사용되는 옵션이다.
+- 기본값인 `read_uncommitted`는 으로 모든 메세지를 읽고, `read_comitted`는 트랜잭션이 완료된 메세지만 읽는다.
+
+### `max.poll.records`
+- 한 번의 poll()요청으로 가져오는 최대 메세지의 수를 지정한다.
+
+### `partition.assignment.strategy`
+- 파티션 할당 전략으로 기본값은 range이다.
+
+### `fetch.max.wait.mx`
+- 가져오려는 데이터의 크기가 `fetch.min.bytes`에 의해 설정된 크기보다 작을 때, 요청에 대한 응답을 기다리는 최대 시간이다.
+
+---
+
+## 4.3 컨슈머 예제
+
+컨슈머는 `오토 커밋`, `동기 가져오기`, `비동기 가져오기`으로 전송할 수 있고 각각 처리량과 데이터 손실의 Trade-Off를 가지고 있다.
+
+### 4.3.1 오토 커밋
+
+기본값으로 가장 많이 사용되는 옵션이다.
+
+- 오프셋을 주기적으로 커밋하여 오프셋을 따로 관리하지 않아도 되는 장점이 있다.
+- 하지만 컨슈머 종료가 빈번히 일어나면 일부 메세지를 못 가져오거나 중복으로 가져오는 단점이 있다.
+
+`.poll(1000)`은 poll의 인터벌을 지정해준 것이다.
+
+```java
+public class ProducerSync {
+  public static void main(String[] args) {
+    // 오토 커밋 설정
+    props.put("enable.auto.commit", "true");
+    
+    KafkConsumer<String, String> consumer = new KafkaConsumer<>(props);
+    consumer.subscribe(Arrays.asList("Topic-Name01"));
+    // ++ 기타 카프카 셋팅
+
+    ConsumerRecords<String, String> records = consumer.poll(1000);
+    
+    for-loop {
+      System.out.println(record.topic());
+      System.out.println(record.partition());
+      System.out.println(record.offset());  
+    }
+  }
+}
+```
+
+### 4.3.2 동기 가져오기
+
+poll()을 이용해 메세지를 가져온 후 처리까지 완료하고 현재 오프셋을 커밋한다.
+
+- 속도가 느리다.
+- 메세지 손실 가능성이 낮다.
+
+메세지가 손실되면 안되는 중요한 처리에는 동기 방식을 권장한다. 하지만 메세지 중복 이슈는 피할 수 없다.
+
+```java
+public class ProducerSync {
+  public static void main(String[] args) {
+    props.put("enable.auto.commit", "false");
+    KafkConsumer<String, String> consumer = new KafkaConsumer<>(props);
+    consumer.subscribe(Arrays.asList("Topic-Name01"));
+    // ++ 기타 카프카 셋팅
+
+    ConsumerRecords<String, String> records = consumer.poll(1000);
+    
+    for-loop {
+      System.out.println(record.topic());
+      System.out.println(record.partition());
+      System.out.println(record.offset());
+      consumer.commitSync();
+    }
+  }
+}
+```
+
+### 4.3.3 비동기 가져오기
+
+비동기 커밋은 재시도를 수행하지 않는다. 그 이유는 아래 흐름에 의해 설명된다.
+
+1. 1번 오프셋의 메세지를 읽은 후 1번 오프셋을 비동기 커밋한다. (커밋 시도 직후 마지막 오프셋은 1이다.)
+2. 2번 오프셋의 메세지를 읽은 후 2번 오프셋을 비동기 커밋했지만 실패한다. (커밋 시도 직후 마지막 오프셋은 1이다.)
+3. 3번 오프셋의 메세지를 읽은후 3번 오프셋을 비동기 커밋한다. (커밋 시도 직후 마지막 오프셋은 3이다.)
+
+이 때 실패했던 2번 커밋을 시도해서 성공하면 마지막 오프셋은 2번이된다. 따라서 오프셋의 무결성이 무너지게 된다.
+
+그래서 비동기 커밋이 실패하더라도 마지막의 비동기 커밋만 성공한다면 안정적으로 오프셋을 커밋할 수 있으므로 콜백을 사용하는 경우도 있다.
+
+```java
+public class ProducerSync {
+  public static void main(String[] args) {
+    props.put("enable.auto.commit", "false");
+    KafkConsumer<String, String> consumer = new KafkaConsumer<>(props);
+    consumer.subscribe(Arrays.asList("Topic-Name01"));
+    // ++ 기타 카프카 셋팅
+
+    ConsumerRecords<String, String> records = consumer.poll(1000);
+    
+    for-loop {
+      System.out.println(record.topic());
+      System.out.println(record.partition());
+      System.out.println(record.offset());
+      consumer.commitAsync();
+    }
+  }
+}
+```
+
+### 4.4.4 컨슈머 그룹
+
+![img.png](https://github.com/mash-up-kr/S3A/blob/master/14th_kafka/dohyeon/image/4_1.png?raw=true)
+
+컨슈머들은 토픽의 파티션과 1:1로 매핑되어 메세지를 가져온다. 
+
+만약 `컨슈머 01`이 문제가 생겨 `종료`되었다면 `컨슈머 02`, 혹은 `컨슈머 03`은 컨슈머 01 ₩대신 파티션 0을 컨슘한다.
