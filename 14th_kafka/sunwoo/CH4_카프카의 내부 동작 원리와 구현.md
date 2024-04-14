@@ -5,7 +5,7 @@
 ![img_14.png](img_14.png)
 - 각각의 파티션의 Leader만 읽기가 쓰고 가능하다.
 - Follower들은 Leader가 이슈가 있을 경우를 대비해 언제든지 새로운 Leader가 될 준비를 한다.
-- 지속적으로 새로운 메시지를 확인하고 새로운 메시지가 있으면 Leader로부터 메시지를 복제합니다.
+- 지속적으로 새로운 메시지를 확인하고 새로운 메시지가 있으면 Leader로부터 메시지를 복제한다.
 
 ### ISR(InSyncReplica)
 - 논리적인 그룹으로 Leader와 Follower는 묶여있으며 ISR 그룹에 속하지 못한 Follower는 새로운 Leader가 될 수 있는 자격이 없다.  
@@ -13,7 +13,7 @@
 > 🤔 ISR로 따로 그룹화 한 이유가 무엇일까?  
 Follower 역시도 불완전한 상태로 존재할 수 있고 불완전한 Follower가 새로운 Leader가 된다면 데이터의 정합성이나 메시지의 손실과 같은 치명적인 문제가 발생할 수 있기 때문이다.
 Leader는 만약 특정 Follower가 특정 주기의 시간만큼 복제요청을 진행하지 않는다면 Replication 동작에 문제가 발생했다고 판단 ISR 그룹에서 추방하며 해당 Follower는 Leader가 될 자격을 박탈당한다.
-역으로 다시 보면 Topic의 상태가 의심될 때 Topic ISR 상태를 점검해 봄으로써 Topic의 상태가 양호한 지 불량한 지에 대해서 확인할 수 있습니다.
+역으로 다시 보면 Topic의 상태가 의심될 때 Topic ISR 상태를 점검해 봄으로써 Topic의 상태가 양호한 지 불량한 지에 대해서 확인할 수 있다.
 
 ![img_15.png](img_15.png)
 
