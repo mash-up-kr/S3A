@@ -482,7 +482,7 @@ public class ProducerSync {
 
 ### 4.4.4 컨슈머 그룹
 
-![img.png](https://github.com/mash-up-kr/S3A/blob/master/14th_kafka/dohyeon/image/4_1.png?raw=true)
+![img.png](https://github.com/mash-up-kr/S3A/blob/master/14th_kafka/dohyeon/image/4_1.jpeg?raw=true)
 
 컨슈머들은 토픽의 파티션과 1:1로 매핑되어 메세지를 가져온다. 
 
