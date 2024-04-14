@@ -63,7 +63,7 @@
 
 즉, 토픽 T에 파티션이 3개라면, `T-P0`, `T-P1`, `T-P2` 와 같이 `토픽-파티션 번호`의 꼴로 디렉터리가 만들어져 저장되게 된다.
 
-![토픽, 파티션, 세그먼트 관계도](https://github.com/mash-up-kr/S3A/blob/14th_kafka/dohyeon/14th_kafka/dohyeon/image/3_1.png?raw=true)
+![토픽, 파티션, 세그먼트 관계도](https://github.com/mash-up-kr/S3A/blob/master/14th_kafka/dohyeon/image/3_1.png?raw=true)
 
 1. 프로듀서가 메세지를 발행한다.
 2. 프로듀서에게 받은 메세지를 파티션 세그먼트 로그 파일에 저장한다.
