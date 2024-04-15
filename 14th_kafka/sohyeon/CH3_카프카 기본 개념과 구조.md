@@ -451,3 +451,267 @@ public class ProducerAsync {
 ---
 
 ## 3.4 컨슈머의 기본 동작과 예제 맛보기
+- 컨슈머는 카프카의 토픽에 저장되어 있는 메시지를 가져오는 역할을 담당한다.
+- 컨슈머가 카프카로부터 빠르게 메시지를 읽어오지 못한다면 결국 지연이 발생한다.
+- 컨슈머의 역할은 매우 중요하므로 동작들을 잘 이해해보자.
+
+<br/>
+
+### 3.4.1 컨슈머의 기본 동작
+- 컨슈머 그룹은 하나 이상의 컨슈머들이 모여 있는 그룹을 의미하고, 컨슈머는 반드시 컨슈머 그룹에 속한다.
+- 컨슈머 그룹은 각 파티션의 리더에게 카프카 토픽에 저장된 메시지를 가져오기 위한 요청을 보낸다.
+- 파티션 수보다 컨슈머 수가 많게 구현하는 것은 바람직하지 않다. (1:1 매핑이 가장 이상적)
+
+<br/>
+
+### 3.4.2 컨슈머의 주요 옵션
+- 컨슈머는 옵션에 따라 오토 커밋, 배치 등의 설정을 할 수 있다.
+
+<br/>
+
+|컨슈머 옵션|설명|
+|---|---|
+|bootstrap.servers|프로듀서와 동일하게 브로커의 정보 입력|
+|fetch.min.bytes|한 번에 가져올 수 있는 최소 데이터 크기<br/>지정한 크기보다 작으면 데이터가 누적될 때까지 대기|
+|group.id|컨슈머가 속한 컨슈머 그룹을 식별하는 식별자|
+|heartbeat.interval.ms|하트비트가 있다는 것은 컨슈머의 상태가 active임을 의미<br/>일반적으로 session.timeout.ms의 1/3로 설정|
+|max.partition.fetch.bytes|파티션당 가져올 수 있는 최대 크기|
+|session.timeout.ms|이 시간을 이용해, 컨슈머가 종료된 것인지를 판단<br/>이 시간 전까지 하트비트를 보내지 않으면 해당 컨슈머는 종료된 것으로 간주|
+|enable.auto.commit|백그라운드로 주기적으로 오프셋을 커밋|
+|auto.offset.reset|카프카에서 초기 오프셋이 없거나 현재 오프셋이 더 이상 존재하지 않는 경우 다음 옵션으로 reset<br/>earliest: 가장 초기의 오프셋값<br/>latest: 가장 마지막의 오프셋값<br/>none: 이전 오프셋값을 찾지 못하면 에러|
+|fetch.max.bytes|한 번의 가져오기 요청으로 가져올 수 있는 최대 크기|
+|group.instance.id|컨슈머의 고유한 식별자<br/>설정하면 static 멤버로 간주되어 불필요한 리밸런싱을 하지 않음|
+|isolation.level|트랜잭션 컨슈머에서 사용되는 옵션<br/>read_uncommitted는 기본값으로 모든 메시지를 읽고,<br/>read_committed는 트랜잭션이 완료된 메시지만 읽음|
+|max.poll.records|한 번의 poll() 요청으로 가져오는 최대 메시지 수|
+|partition.assignment.strategy|파티션 할당 전략, 기본값은 range|
+|fetch.max.wait.ms|fetch.min.bytes에 의해 설정된 데이터보다 적은 경우 요청에 대한 응답을 기다리는 최대 시간|
+
+🔼 컨슈머 주요 옵션
+
+<br/>
+
+### 3.4.3 컨슈머 예제
+- 컨슈머에서 메시지를 가져오는 방법은 3가지 방식으로 크게 나뉜다.
+  - 오토 커밋
+  - 동기 가져오기
+  - 비동기 가져오기
+ 
+<br/>
+
+```java
+package consumer;
+
+import java.util.List;
+import java.util.Properties;
+
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+
+public class ConsumerAuto {
+	public static void main(String[] args) {
+		Properties props = new Properties();// 1
+		props.put("bootstrap.server", "peter-kafka01.foo.bar:9092,peter-kafka02.foo.bar:9092,peter-kafka03.foo.bar:9092"); // 2
+		props.put("group.id", "peter-consumer01"); // 3
+		props.put("enable.auto.commit", "true"); // 4
+		props.put("auto.offset.reset", "latest"); // 5
+		
+		// 6
+		props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+		props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+
+		KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);// 7
+		consumer.subscribe(List.of("peter-basic01")); // 8
+		
+		try {
+			while (true) { // 9
+				ConsumerRecords<String, String> records = consumer.poll(1000);// 10
+				for (ConsumerRecord<String, String> record : records) { // 11
+					System.out.println("Topic: " + record.topic()
+							+ ", Partition: " + record.partition()
+							+ ", Offset: " + record.offset()
+							+ ", Key: " + record.key()
+							+ ", Received Message: " + record.value());
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			consumer.close(); // 12
+		}
+	}
+}
+```
+🔼 오토 커밋(ConsumerAuto.java)
+1. Properties 객체 생성
+2. 브로커 리스트 정의
+3. 컨슈머 그룹 아이디 정의
+4. 오토 커밋 사용
+5. 컨슈머 오프셋을 찾지 못하는 경우 latest로 초기화하며 가장 최근부터 메시지를 가져옴
+6. 문자열을 사용했으므로 StringDeserializer 지정
+7. Properties 객체를 전달해 새 컨슈머 생성
+8. 구독할 토픽을 지정
+9. 무한 루프 시작. 메시지를 가져오기 위해 카프카에 지속적으로 poll()을 함
+10. 컨슈머는 폴링하는 것을 계속 유지하며, 타임아웃 주기를 설정. 해당 시간만큼 블록함
+11. poll()은 레코드 전체를 리턴하고, 하나의 메시지만 가져오는 것이 아니므로 반복문 처리
+12. 컨슈머 종료
+
+<br/>
+
+- 애플리케이션들의 기본값으로 가장 많이 사용된다.
+- 👍 오프셋을 주기적으로 커밋하므로 관리자가 오프셋을 따로 관리하지 않아도 된다.
+- 👎 컨슈머 종료 등이 빈번히 일어나면 일부 메시지를 못 가져오거나 중복으로 가져오는 경우도 있다.
+- 웬만하면 이슈가 거의 없기 때문에 많이 사용한다.
+
+<br/>
+
+```java
+package consumer;
+
+import java.util.List;
+import java.util.Properties;
+
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+
+public class ConsumerSync {
+	public static void main(String[] args) {
+		Properties props = new Properties();// 1
+		props.put("bootstrap.server", "peter-kafka01.foo.bar:9092,peter-kafka02.foo.bar:9092,peter-kafka03.foo.bar:9092"); // 2
+		props.put("group.id", "peter-consumer01"); // 3
+		props.put("enable.auto.commit", "false"); // 4
+		props.put("auto.offset.reset", "latest"); // 5
+
+		// 6
+		props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+		props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+
+		KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);// 7
+		consumer.subscribe(List.of("peter-basic01")); // 8
+
+		try {
+			while (true) { // 9
+				ConsumerRecords<String, String> records = consumer.poll(1000);// 10
+				for (ConsumerRecord<String, String> record : records) { // 11
+					System.out.println("Topic: " + record.topic()
+							+ ", Partition: " + record.partition()
+							+ ", Offset: " + record.offset()
+							+ ", Key: " + record.key()
+							+ ", Received Message: " + record.value());
+				}
+				consumer.commitSync(); // 12
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			consumer.close(); // 13
+		}
+	}
+}
+```
+🔼 동기 가져오기(ConsumerSync.java)
+1. Properties 객체 생성
+2. 브로커 리스트 정의
+3. 컨슈머 그룹 아이디 정의
+4. 오토 커밋을 사용하지 않음
+5. 컨슈머 오프셋을 찾지 못하는 경우 latest로 초기화하며 가장 최근부터 메시지를 가져옴
+6. 문자열을 사용했으므로 StringDeserializer 지정
+7. Properties 객체를 전달해 새 컨슈머 생성
+8. 구독할 토픽을 지정
+9. 무한 루프 시작. 메시지를 가져오기 위해 카프카에 지속적으로 poll()을 함
+10. 컨슈머는 폴링하는 것을 계속 유지하며, 타임아웃 주기를 설정. 해당 시간만큼 블록함
+11. poll()은 레코드 전체를 리턴하고, 하나의 메시지만 가져오는 것이 아니므로 반복문 처리
+12. 현재 배치를 통해 읽은 모든 메시지를 처리한 후, 추가 메시지를 폴링하기 전 현재의 오프셋을 동기 커밋
+13. 컨슈머 종료
+
+<br/>
+
+- 동기 방식으로 가져오는 경우 느리지만, 메시지 손실은 거의 발생하지 않는다.
+- 메시지가 손실되면 안 되는 중요한 처리 작업들은 동기 방식으로 진행하는 것을 권장한다.
+- 메시지의 중복 이슈는 피할 수 없다.
+
+<br/>
+
+```java
+package consumer;
+
+import java.util.List;
+import java.util.Properties;
+
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+
+public class ConsumerAsync {
+	public static void main(String[] args) {
+		Properties props = new Properties();// 1
+		props.put("bootstrap.server", "peter-kafka01.foo.bar:9092,peter-kafka02.foo.bar:9092,peter-kafka03.foo.bar:9092"); // 2
+		props.put("group.id", "peter-consumer01"); // 3
+		props.put("enable.auto.commit", "false"); // 4
+		props.put("auto.offset.reset", "latest"); // 5
+
+		// 6
+		props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+		props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+
+		KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);// 7
+		consumer.subscribe(List.of("peter-basic01")); // 8
+
+		try {
+			while (true) { // 9
+				ConsumerRecords<String, String> records = consumer.poll(1000);// 10
+				for (ConsumerRecord<String, String> record : records) { // 11
+					System.out.println("Topic: " + record.topic()
+							+ ", Partition: " + record.partition()
+							+ ", Offset: " + record.offset()
+							+ ", Key: " + record.key()
+							+ ", Received Message: " + record.value());
+				}
+				consumer.commitAsync(); // 12
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			consumer.close(); // 13
+		}
+	}
+}
+```
+🔼 비동기 가져오기(ConsumerAsync.java)
+1. Properties 객체 생성
+2. 브로커 리스트 정의
+3. 컨슈머 그룹 아이디 정의
+4. 오토 커밋을 사용하지 않음
+5. 컨슈머 오프셋을 찾지 못하는 경우 latest로 초기화하며 가장 최근부터 메시지를 가져옴
+6. 문자열을 사용했으므로 StringDeserializer 지정
+7. Properties 객체를 전달해 새 컨슈머 생성
+8. 구독할 토픽을 지정
+9. 무한 루프 시작. 메시지를 가져오기 위해 카프카에 지속적으로 poll()을 함
+10. 컨슈머는 폴링하는 것을 계속 유지하며, 타임아웃 주기를 설정. 해당 시간만큼 블록함
+11. poll()은 레코드 전체를 리턴하고, 하나의 메시지만 가져오는 것이 아니므로 반복문 처리
+12. 현재 배치를 통해 읽은 모든 메시지를 처리한 후, 추가 메시지를 폴링하기 전 현재의 오프셋을 비동기 커밋
+13. 컨슈머 종료
+
+<br/>
+
+- commitAsync()는 오프셋 커밋을 실패하더라도 재시도하지 않는다.
+- 커밋 재시도하면, 비동기 커밋 재시도로 인해 메시지가 계속 중복될 수 있다.
+- 마지막의 비동기 커밋만 성공한다면 안정적으로 오프셋을 커밋한다.
+- 비동기 방식을 보완하기 위한 방법으로 콜백을 같이 사용할 수도 있다.
+
+<br/>
+
+### 3.4.4 컨슈머 그룹의 이해
+- 컨슈머는 컨슈머 그룹 안에 속한 것이 일반적인 구조로, 하나의 컨슈머 그룹 안에 여러 개의 컨슈머가 구성될 수 있다.
+- 컨슈머들은 토픽의 파티션과 일대일로 매핑되어 메시지를 가져온다.
+
+<br/>
+
+<img width="550" alt="image" src="https://github.com/mash-up-kr/S3A/assets/55437339/e4144a27-aea9-4d37-82b6-5ab1ac8079f4" />
+
+🔼 컨슈머 그룹과 컨슈머
+- 좌측에 peter-01이라는 토픽이 있고, 파티션 0, 1, 2라는 총 3개의 파티션으로 구성되어 있다.
+- 우측에는 컨슈머 그룹01이라는 컨슈머 그룹 아이디를 가진 컨슈머 그룹이 있고, peter-01 토픽의 파티션 수와 동일한 3개의 컨슈머가 속해 있다.
+- 컨슈머들은 하나의 컨슈머 그룹 안에 속해 있고, 그룹 내의 컨슈머들은 서로의 정보를 공유한다.
+- 컨슈머01이 문제가 생겨 종료됐다면, 컨슈머02 또는 컨슈머03이 컨슈머01이 하던 일을 대신해 peter-01 토픽의 파티션0을 컨슘한다.
