@@ -207,3 +207,247 @@ $ xxd 00000000000000000000.log
 ---
 
 ## 3.3 프로듀서의 기본 동작과 예제 맛보기
+- 프로듀서는 카프카의 토픽으로 메시지를 전송하는 역할을 담당한다.
+- 프로듀서는 여러 옵션을 제공하여, 원하는 형태에 따라 옵션을 변경하면서 다양한 방법으로 카프카로 메시지를 전송할 수 있다.
+
+<br/>
+
+### 3.3.1 프로듀서 디자인
+- 프로듀서가 어떻게 디자인되어 있는지 살펴본다.
+
+<br/>
+
+<img width="550" alt="image" src="https://github.com/mash-up-kr/S3A/assets/55437339/314d3216-b3ae-4ceb-886d-8475b20b5324" />
+
+🔼 프로듀서 디자인
+- ProducerRecord 부분은 카프카로 전송하기 위한 실제 데이터로, 토픽, 파티션, 키, 밸류로 구성된다.
+- 레코드에서 토픽/밸류(메시지 내용)은 필수값이며, 파티션/키는 선택사항(옵션)이다.
+- 각 레코드들은 프로듀서의 send() 메서드를 통해 시리얼라이저(serializer), 파티셔너(partitioner)를 거치게 된다.
+- 파티션을 지정했다면, 지정된 파티션으로 전달되고, 아니면 키를 가지고 파티션을 선택해 레코드를 전달한다. (기본적으로 RR방식 동작)
+- 레코드들을 파티션별로 모아두는 이유는, 카프카로 전송하기 전 배치 전송을 하기 위함이다.
+  - 전송이 실패하면 재시도 동작이 이뤄진다.
+  - 지정된 횟수만큼 재시도가 실패하면 최종 실패를 전달한다.
+  - 전송이 성공하면 메타데이터를 리턴한다.
+
+<br/>
+
+### 3.3.2 프로듀서의 주요 옵션
+- 프로듀서를 잘 파악하고 다뤄야 좀 더 효율적이고 안정적으로 사용할 수 있다.
+
+<br/>
+
+|프로듀서 옵션|설명|
+|---|---|
+|bootstrap.servers|클라이언트가 카프카 클러스터에 처음 연결하기 위한 호스트와 포트 정보|
+|client.dns.lookup|클라이언트가 하나의 IP와 연결하지 못할 경우 다른 IP로 시도하는 설정|
+|acks|프로듀서가 카프카 토픽의 리더 측에 메시지를 요청한 후 요청을 완료하기를 결정하는 옵션|
+|buffer.memory|프로듀서가 카프카 서버로 데이터를 보내기 위해 잠시 대기할 수 있는 전체 메모리 바이트|
+|compression.type|프로듀서가 메시지 전송 시 선택할 수 있는 압축 타입|
+|enable.idempotence|설정을 true로 하는 경우 중복 없는 전송이 가능 <br/>max.in.flight.requests.per.connection은 5 이하<br/>retries는 0 이상<br/>acks는 all|
+|max.in.flight.requests.per.connection|하나의 커넥션에서 프로듀서가 최대한 ACK 없이 전송할 수 있는 요청 수|
+|retries|일시적인 오류로 인해 전송에 실패한 데이터를 다시 보내는 횟수|
+|batch.size|프로듀셔는 동일한 파티션으로 보내는 여러 데이터를 함께 배치로 보내려고 시도하는데, 그 배치 크기|
+|linger.ms|배치 형태의 메시지를 보내기 전에 추가적인 메시지를 위해 기다리는 시간<br/>배치 크기에 도달하지 못한 상황에서 제한 시간에 도달했을 때 메시지 전송|
+|transactional.id|정확히 한 번 전송을 위해 사용하는 옵션<br/>동일한 TransactionId에 한해 정확히 한 번을 보장|
+
+🔼 주요 프로듀서 옵션
+
+<br/>
+
+### 3.3.3 프로듀서 예제
+- 프로듀서의 전송 방법은 3가지 방식으로 크게 나뉜다.
+  - 메시지를 보내고 확인하지 않기
+  - 동기 전송
+  - 비동기 전송
+
+<br/>
+
+```java
+import java.util.Properties;
+
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerRecord;
+
+public class ProducerFireForgot {
+	public static void main(String[] args) {
+		Properties props = new Properties(); // 1
+		props.put("bootstrap.server", "peter-kafka01.foo.bar:9092,peter-kafka02.foo.bar:9092,peter-kafka03.foo.bar:9092"); // 2
+		
+		// 3
+		props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+		props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+
+		KafkaProducer<String, String> producer = new KafkaProducer<>(props); // 4
+		
+		try {
+			for (int i = 0; i < 3; i++) {
+				ProducerRecord<String, String> record = new ProducerRecord<>(
+						"peter-basic01", "Apache Kafka is a distributed streaming platform - " + i); //5
+				producer.send(record); // 6
+			}
+		} catch (Exception e) {
+			e.printStackTrace(); // 7
+		} finally {
+			producer.close(); // 8
+		}
+	}
+}
+```
+🔼 메시지를 보내고 확인하지 않기 예제 (ProducerFireForgot.java)
+1. Properties 객체 생성
+2. 브로커 리스트 정의
+3. 메시지 키와 밸류는 문자열 타입이므로 카프카의 기본 StringSerializer를 지정
+4. Properties 객체를 전달해 새 프로듀서 생성
+5. ProducerRecord 객체 생성
+6. send() 메서드를 사용해 메시지를 전송한 후 자바 Future 객체로 RecordMetadata를 리턴받지만, 리턴값을 무시하므로 메시지가 성공적으로 전송됐는지 알 수 없음
+7. 카프카 브로커에게 메시지를 전송한 후의 에러는 무시하지만, 전송 전에 에러가 발생하면 예외를 처리할 수 있음
+8. 프로듀서 종료
+
+<br/>
+
+- 실제 운영에서 사용하는 것은 추천하지 않는다.
+- 하지만 대부분은 성공적으로 메시지가 전송된다.
+
+<br/>
+
+```java
+import java.util.Properties;
+
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
+
+public class ProducerSync {
+	public static void main(String[] args) {
+		Properties props = new Properties(); // 1
+		props.put("bootstrap.server", "peter-kafka01.foo.bar:9092,peter-kafka02.foo.bar:9092,peter-kafka03.foo.bar:9092"); // 2
+
+		// 3
+		props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+		props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+
+		KafkaProducer<String, String> producer = new KafkaProducer<>(props); // 4
+
+		try {
+			for (int i = 0; i < 3; i++) {
+				ProducerRecord<String, String> record = new ProducerRecord<>(
+						"peter-basic01", "Apache Kafka is a distributed streaming platform - " + i); //5
+				
+				RecordMetadata metadata = producer.send(record).get();// 6
+
+				System.out.println("Topic: " + metadata.topic()
+						+ ", Partition: " + metadata.partition()
+						+ ", Offset: " + metadata.offset()
+						+ ", Key: " + record.key()
+						+ ", Received Message: " + record.value());
+			}
+		} catch (Exception e) {
+			e.printStackTrace(); // 7
+		} finally {
+			producer.close(); // 8
+		}
+	}
+}
+```
+🔼 동기 전송(ProducerSync.java)
+1. Properties 객체 생성
+2. 브로커 리스트 정의
+3. 메시지 키와 밸류는 문자열 타입이므로 카프카의 기본 StringSerializer를 지정
+4. Properties 객체를 전달해 새 프로듀서 생성
+5. ProducerRecord 객체 생성
+6. get() 메서드를 이용해 카프카의 응답을 기다림. 메시지가 성공적으로 전송되지 않으면 예외가 발생하고, 에러가 없다면 RecordMetadata를 얻음
+7. 카프카로 메시지를 보내기 전과 보내는 동안 에러가 발생하면 예외가 발생함
+8. 프로듀서 종료
+
+<br/>
+
+- ProducerRecord 전송이 성공하고 나면 RecordMetadata를 읽어 들여 파티션과 오프셋 정보를 확인할 수 있다.
+- 메시지 전달의 성공 여부를 파악할 수 있다.
+- 신뢰성 있는 메시지 전달 과정의 핵심이다.
+
+<br/>
+
+```java
+import org.apache.kafka.clients.producer.Callback;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
+
+public class PeterProducerCallback implements Callback { // 1
+
+	private ProducerRecord<String, String> record;
+
+	public PeterProducerCallback(ProducerRecord<String, String> record) {
+		this.record = record;
+	}
+
+	@Override
+	public void onCompletion(RecordMetadata metadata, Exception exception) {
+		if (exception != null) {
+			exception.printStackTrace(); // 2
+		} else {
+			System.out.println("Topic: " + metadata.topic()
+					+ ", Partition: " + metadata.partition()
+					+ ", Offset: " + metadata.offset()
+					+ ", Key: " + record.key()
+					+ ", Received Message: " + record.value());
+		}
+	}
+}
+```
+🔼 콜백 예제(PeterProducerCallback.java)
+1. 콜백을 사용하기 위해 org.apache.kakfa.clients.producer.Callback을 구현하는 클래스가 필요함
+2. 카프카가 오류를 리턴하면 onCompletion()은 예외를 갖게 되며, 실제 운영 환경에서는 추가적인 예외 처리가 필요함
+
+<br/>
+
+```java
+import java.util.Properties;
+
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerRecord;
+
+public class ProducerAsync {
+	public static void main(String[] args) {
+		Properties props = new Properties(); // 1
+		props.put("bootstrap.server", "peter-kafka01.foo.bar:9092,peter-kafka02.foo.bar:9092,peter-kafka03.foo.bar:9092"); // 2
+
+		// 3
+		props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+		props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+
+		KafkaProducer<String, String> producer = new KafkaProducer<>(props); // 4
+
+		try {
+			for (int i = 0; i < 3; i++) {
+				ProducerRecord<String, String> record = new ProducerRecord<>(
+						"peter-basic01", "Apache Kafka is a distributed streaming platform - " + i); //5
+
+				producer.send(record, new PeterProducerCallback(record));// 6
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			producer.close(); // 7
+		}
+	}
+}
+```
+🔼 비동기 전송(ProducerAsync.java)
+1. Properties 객체 생성
+2. 브로커 리스트 정의
+3. 메시지 키와 밸류는 문자열 타입이므로 카프카의 기본 StringSerializer를 지정
+4. Properties 객체를 전달해 새 프로듀서 생성
+5. ProducerRecord 객체 생성
+6. 프로듀서에서 레코드를 보낼 때 콜백 객체를 같이 보냄
+7. 프로듀서 종료
+
+<br/>
+
+- 프로듀서는 send() 메서드와 콜백을 함께 호출한다.
+- 비동기 방식으로 전송하면 빠른 전송이 가능하고, 메시지 전송이 실패한 경우라도 예외를 처리할 수 있어서 이후 에러 로그 등에 기록할 수도 있다.
+
+<br/>
+
+---
+
+## 3.4 컨슈머의 기본 동작과 예제 맛보기
