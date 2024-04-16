@@ -439,4 +439,106 @@ $ /usr/local/kafka/bin/kafka-console-producer.sh --bootstrap-server peter-kafka0
 
 🔼 제어된 종료 과정
 1. 관리자가 브로커 종료 명렁어를 실행하고, SIG_TERM 신호가 브로커에게 전달된다.
-2. 
+2. SIG_TERM 신호를 받은 브로커는 컨트롤러에게 알린다.
+3. 컨트롤러는 리더 선출 작업을 진행하고, 해당 정보를 주키퍼에 기록한다.
+4. 컨트롤러는 새로운 리더 정보를 다른 브로커들에게 전송한다.
+5. 컨트롤러는 종료 요청을 보낸 브로커에게 정상 종료한다는 응답을 보낸다.
+6. 응답을 받은 브로커는 캐시에 있는 내용을 디스크에 저장하고 종료한다.
+
+<br/>
+
+- 제어된 종료는 급작스러운 종료에 비해 다운타임(downtime)이 최소화된다.
+- 로그 복구 시간도 더 짧다.
+
+<br/>
+
+---
+
+## 4.3 로그(로그 세그먼트)
+- 카프카의 토픽으로 들어오는 메시지(레코드)는 세그먼트(segment)라는 파일에 저장된다.
+- 로그 세그먼트 파일들은 브로커의 로컬 디스크에 보관된다.
+- 최대 크기는 1GB이고, 그 크기를 넘어가면 롤링(rolling) 작업을 수행한다.
+
+<br/>
+
+### 4.3.1 로그 세그먼트 삭제
+- 기본 값
+
+<br/>
+
+```
+$ /usr/local/kafka/bin/kafka-topics.sh --bootstrap-server peter-kafka01.foo.bar:9092 --create --topic peter-test03 --partitions 1 --replication-factor 3
+```
+🔼 토픽 생성
+- 이름은 peter-test03, 파티션 1, 리플리케이션 팩터 3으로 구성
+
+<br/>
+
+```
+$ /usr/local/kafka/bin/kafka-console-producer.sh --bootstrap-server peter-kafka01.foo.bar:9092 --topic peter-test03
+> log1
+```
+🔼 프로듀서에서 메시지 전송
+- log1 메시지 전송
+
+<br/>
+
+```
+$ /usr/local/kafka/bin/kafka-console-consumer.sh --bootstrap-server peter-kafak01.foo.bar:9092 --topic peter-test03 --from-beginning
+```
+🔼 컨슈머에서 메시지 가져오기
+- log1 메시지를 가져온다. (출력됨)
+
+<br/>
+
+```
+$ /usr/local/kafka/bin/kafka-configs.sh --bootstrap-server peter-kafka01.foo.bar:9092 --topic peter-test03 --add-config retention.ms=0 --alter
+```
+🔼 설정 추가
+- `retention.ms=0`이라는 설정을 추가한다.
+- 로그 세그먼트 보관 시간이 해당 숫자보다 크면 세그먼트를 삭제한다.
+- 토픽 상세 정보 조회 명령어를 실행하면, Configs의 retention.ms=0이 추가되어 있는 것을 확인할 수 있다.
+- 기본값 5분 간격으로 로그 세그먼트 파일을 체크하면서 삭제 작업이 수행된다.
+
+<br/>
+
+**로그 세그먼트 파일명이 생성되는 규칙**
+- 0001.log 파일명에서 1은 오프셋 번호를 의미한다.
+- 로그 세그먼트 파일을 생성할 때 오프셋 시작 번호를 이용해 파일 이름을 생성하는 규칙을 따른다.
+
+<br/>
+
+```
+$ /usr/local/kafka/bin/kafka-configs.sh --bootstrap-server peter-kafka01.foo.bar:9092 --topic peter-test03 --delete-config retention.ms --alter
+```
+🔼 설정 삭제
+- `retention.ms` 설정이 삭제된다.
+
+<br/>
+
+### 4.3.2 로그 세그먼트 컴팩션
+- 컴팩션(compaciton): 카프카에서 제공하는 로그 세그먼트 관리 정책 중 하나로, 로그를 삭제하지 않고 컴팩션하여 보관할 수 있다.
+- 기본적으로 로컬 디스크에 저장되어 있는 세그먼트를 대상으로 실행되는데, 현재 활성화된 세그먼트는 제외하고 나머지 세그먼트들을 대상으로 컴팩션이 실행된다.
+- 하지만 카프카에서는 메시지 컴팩션 보관보다 좀 더 효율적인 방법으로 컴팩션한다.
+- 메시지 키값을 기준으로 과거 정보는 중요하지 않고 가장 마지막 값이 필요한 경우에 사용한다.
+- 카프카로 메시지를 전송할 때 키도 필숫값으로 전송해야 한다.
+
+<br/>
+
+> ***_consumer_offset 토픽***
+
+- _consumer_offset 토픽: 카프카의 내부 토픽, 컨슈머 그룹의 정보를 저장하는 토픽
+- 키(컨슈머 그룹명, 토픽명)와 밸류(오프셋 커밋 정보) 형태로 메시지가 저장된다.
+
+<br/>
+
+<img width="550" alt="image" src="https://github.com/mash-up-kr/S3A/assets/55437339/a045d9b6-2350-454b-a96c-5138cdab067f" />
+
+🔼 로그 컴팩션 과정
+- 컴팩션 전 로그에서 키값이 K1인 밸류들을 확인해보면, 오프셋 0일 때 V1, 오프셋 2일 때 V3, 오프셋 3일 때 V4로 확인된다. (마지막 밸류는 V4)
+- 따라서 컴팩션 후 로그를 보면 K1 키의 밸류는 V4이다. (마지막 메시지만 로컬 디스크에 저장되고, 나머지는 삭제)
+- 👍 빠른 장애 복구 가능
+- 키값을 기준으로 최종값만 필요한 워크로드에 적용하는 것이 바람직하다.
+
+<br/>
+
