@@ -542,3 +542,12 @@ $ /usr/local/kafka/bin/kafka-configs.sh --bootstrap-server peter-kafka01.foo.bar
 
 <br/>
 
+|옵션 이름|옵션 값|적용 범위|설명|
+|---|---|---|---|
+|cleaup.policy|compact|토픽의 옵션으로 적용|토픽 레벨에서 로그 컴팩션을 설정할 때 적용하는 옵션|
+|log.cleanup.policy|compact|브로커의 설정 파일에 적용|브로커 레벨에서 로그 컴팩션을 설정할 때 적용하는 옵션|
+|log.cleaner.min.compaction.lag.ms|0|브로커의 설정 파일에 적용|메시지가 기록된 후 컴팩션하기 전 경과되어야 할 최소 시간을 지정한다. 만약 이 옵션을 설정하지 않으면, 마지막 세그먼트를 제외하고 모든 세그먼트를 컴팩션할 수 있다.|
+|log.cleaner.max.compaction.lag.ms|9223372036854775807|브로커의 설정 파일에 적용|메시지가 기록된 후 컴팩션하기 전 경과되어야 할 최대 시간을 지정한다.|
+|log.cleaner.min.cleanable.ratio|0.5|브로커의 설정 파일에 적용|로그에서 압축되지 않은 부분을 더티(dirty)라고 표현한다. "전체 로그" 대비 "더티" 비율이 50%가 넘으면 로그 컴팩션이 실행된다.|
+
+🔼 로그 컴팩션 관련 옵션
