@@ -102,3 +102,58 @@ baseOffset: 0 lastOffset: 0 count: 1 baseSequnece: -1 lastSequence: -1 produceId
 <br/>
 
 ### 4.1.3 복제 유지와 커밋
+- 리더와 팔로워는 ISR(InSyncReplica)이라는 논리적인 그룹으로 묶여있다.
+- 기본적으로 해당 그룹 안에 속한 팔로워들만이 새로운 리더의 자격을 가질 수 있다.
+- ISR 내의 **팔로워**들은 리더와의 데이터 일치를 유지하기 위해 지속적으로 리더의 데이터를 따라가게 되고, **리더**는 모든 팔로워가 메시지를 받을 때까지 기다린다.
+- 파티션의 리더는 팔로워들이 뒤처지지 않고 리플리케이션 동작을 잘하고 있는지 감시한다. (뒤처지지 않는 팔로워들만이 새로운 리더의 자격을 가질 수 있음)
+- 팔로워가 특정 주기의 시간만큼 복제 요청을 하지 않는다면, 문제가 발생했다고 판단되고 ISR 그룹에서 추방당한다.
+- ISR 내에서 모든 팔로워의 복제가 완료되면, 리더는 내부적으로 커밋되었다는 표시를 하게 된다.
+- 마지막 커밋 오프셋 위치는 **하이워터마크(high water mark)** 라고 부른다.
+- 커밋된 메시지만 컨슈머가 읽어갈 수 있다. (메시지의 일관성 유지)
+
+<br/>
+
+<img width="550" alt="image" src="https://github.com/mash-up-kr/S3A/assets/55437339/eaf6ce6a-ae44-45d0-9cb5-979affcb71ca" />
+
+🔼 커밋 메시지
+- peter-test01 토픽을 표현 : 1개의 파티션과 3개의 리플리케이션 팩터로 설정
+- 프로듀서가 "test message1"이라는 메시지를 토픽으로 보냈고, 모든 팔로워가 리플리케이션 동작을 통해 모두 저장하고 커밋까지 완료된 상태이다.
+- 프로듀서가 "test message2"이라는 메시지를 토픽으로 보냈고, 리더만 저장했고, 팔로워들은 리플리케이션 동작 전이다.
+
+<br/>
+
+<img width="550" alt="image" src="https://github.com/mash-up-kr/S3A/assets/55437339/8ff5085e-2b1c-4098-95b4-71c6c1aa0780" />
+
+<img width="550" alt="image" src="https://github.com/mash-up-kr/S3A/assets/55437339/dfb3a991-790b-4e5e-bacc-a9449a9dfdc8" />
+
+🔼 리더 선출 전후 컨슘된 메시지 확인
+- 커밋되기 전 메시지를 컨슈머가 읽을 수 있다고 가정한다.
+- 각기 다른 컨슈머가 메시지를 컨슘하는 동안 파티션의 리더 선출이 발생한 경우이다.
+1. 컨슈머 A는 peter-test01 토픽을 컨슘한다.
+2. 컨슈머 A는 peter-test01 토픽의 파티션 리더로부터 메시지를 읽어간다. 읽어간 메시지는 test message1, 2이다.
+3. peter-test01 토픽의 파티션 리더가 있는 브로커에 문제가 발생해 팔로워 중 하나가 새로운 리더가 된다.
+4. 프로듀서가 보낸 test message2 메시지는 아직 팔로워들에게 리플리케이션 되지 않은 상태에서 새로운 리더로 변경됐으므로, 새로운 리더는 test message1 메시지만 갖고 있다.
+5. 새로운 컨슈머 B가 peter-test01 토픽을 컨슘한다.
+6. 새로운 리더로부터 메시지를 읽어가고, 읽어간 메시지는 오직 test message1이다.
+
+<br/>
+
+```
+$ cat /data/kafka-logs/replication-offset-checkpoint
+```
+🔼 replication-offset-checkpoint 파일 확인
+- 커밋된 메시지를 유지하기 위해 로컬 디스크의 replication-offset-checkpoint라는 파일에 마지막 커밋 오프셋 위치를 저장한다.
+
+<br/>
+
+```
+peter-test01 0 1
+```
+🔼 출력 결과
+- peter-test01은 앞서 생성한 토픽 이름
+- 0은 파티션 번호, 1은 커밋된 오프셋 번호
+- "test message2" 메시지도 커밋되면 오프셋 번호는 1에서 2로 변경된다.
+
+<br/>
+
+### 4.1.4 리더와 팔로워의 단계별 리플리케이션 동작
