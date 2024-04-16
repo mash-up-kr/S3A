@@ -19,13 +19,13 @@
 
 ## 14th Spring Team
 
-### Effective Kotlin
+### [Effective Kotlin](https://github.com/mash-up-kr/S3A/tree/master/14th_effective-kotlin)
 - 멤버 : [한정민](https://github.com/xonmin), [김보배](https://github.com/KimDoubleB), [오예원](https://github.com/yaeoni), [박범근](https://github.com/bbeomgeun)
 
-### Kafka
+### [Kafka](https://github.com/mash-up-kr/S3A/tree/master/14th_kafka)
 - 멤버 : [박재민](https://github.com/mkSpace), [주성민](https://github.com/god9599), [김소현](), [임준형](https://github.com/toychip), [김도현](https://github.com/K-Diger), [호선우](https://github.com/hocaron)
 
-### Optimizing Java
+### [Optimizing Java](https://github.com/mash-up-kr/S3A/tree/master/14th_optimizing-java)
 - 멤버 : [김경환](https://github.com/kh0712), [박세원](https://github.com/wonlog-g), [이원영](https://github.com/210-reverof), [정종민](https://github.com/alertjjm)
 
 --- 
