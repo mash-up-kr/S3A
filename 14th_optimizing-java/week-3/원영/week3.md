@@ -106,7 +106,7 @@ intCharged = true;
 
 ### 자바 스레드 생명 주기
 
-https://oopy.lazyrockets.com/api/v2/notion/image?src=https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2F4ae52cdc-70ce-4598-b991-478d127748c6%2FScreen_Shot_2021-08-16_at_5.25.27.png&blockId=e173fdec-a784-48c2-995b-21279a860d4c
+![image](https://github.com/mash-up-kr/S3A/assets/74983448/29ab10d9-cac4-458d-9f16-da95bca075dc)
 
 - 스케줄러는 할당시간 끝에 실행 큐를 사용해 스레드를 되돌려 큐의 맨 앞으로 배치시켜 다시 실행
 - 스레드는 자신이 할당받은 시간을 포기하려면 sleep(), wait() 을 사용
