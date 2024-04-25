@@ -184,3 +184,26 @@ $ /usr/local/kafka/bin/kafka-dump-log.sh --print-data-log --files /data/kafka-lo
 <br/>
 
 ## 5.4 정확히 한 번 전송
+- 트랜잭션과 같은 전체적인 프로세스 처리를 의미한다.
+- 중복 없는 전송은 정확히 한 번 전송의 일부 기능이라고 할 수 있다.
+- 정확히 한 번 처리를 담당하는 별도의 프로세스가 있는데, 이를 **트랜잭션 API**라고 한다.
+
+<br/>
+
+### 5.4.1 디자인
+- 트랜잭션 코디네이터(transaction coordinator)
+  - 프로듀서에 의해 전송된 메시지를 관리한다.
+  - 커밋 또는 중단 등을 표시한다.
+- _transaction_state
+  - 카프카의 내부 토픽
+  - 트랜잭션 로그를 저장한다.
+  - 기본 값
+    - transaction.state.log.num.partitions=50
+    - transaction.state.log.replication.factor=3
+- 컨트롤 메시지
+  - 클라이언트들이 메시지들을 식별하기 위한 정보로서 사용된다.
+  - 브로커와 클라이언트 통신에서만 사용된다.
+ 
+<br/>
+
+### 5.4.2 프로듀서 예제 코드
