@@ -207,3 +207,135 @@ $ /usr/local/kafka/bin/kafka-dump-log.sh --print-data-log --files /data/kafka-lo
 <br/>
 
 ### 5.4.2 프로듀서 예제 코드
+```java
+package producer;
+
+import java.util.Properties;
+
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.Producer;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.serialization.StringSerializer;
+
+public class ExactlyOnceProducer {
+	public static void main(String[] args) {
+		String bootstrapServers = "peter-kafka01.foo.bar:9092";
+		Properties props = new Properties();
+		props.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+		props.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+		
+		// 정확히 한 번 전송을 위한 설정
+		props.setProperty(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, "true");
+		props.setProperty(ProducerConfig.ACKS_CONFIG, "all");
+		props.setProperty(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, "5");
+		props.setProperty(ProducerConfig.RETRIES_CONFIG, "5");
+		props.setProperty(ProducerConfig.TRANSACTIONAL_ID_CONFIG, "peter-transaction-01");
+		
+		Producer<String, String> producer = new KafkaProducer<>(props);
+		
+		producer.initTransactions(); // 프로듀서 트랜잭션 초기화
+		producer.beginTransaction(); // 프로듀서 트랜잭션 시작
+		
+		try {
+			for (int i = 0; i < 1; i++) {
+				ProducerRecord<String, String> record = new ProducerRecord<>(
+						"peter-test05", 
+						"Apache Kafka is a distributed streaming platform - " + i);
+				producer.send(record);
+				producer.flush();
+				System.out.println("Message sent successfully");
+			}
+		} catch (Exception e) {
+			producer.abortTransaction(); // 프로듀서 트랜잭션 중단
+			producer.close();
+		} finally {
+			producer.commitTransaction(); // 프로듀서 트랜잭션 커밋
+			producer.close();
+		}
+	}
+}
+```
+🔼 트랜잭션 프로듀서 예제 코드 (ExactlyOnceProducer.java)
+- TRANSACTIONAL_ID_CONFIG
+  - 중복 없는 전송과 정확히 한 번 전송의 옵션 설정에서 가장 큰 차이점이자 주의해야 할 설정
+  - 실행하는 프로듀서 프로세스마다 고유한 아이디로 설정해야 한다. (2개 프로듀서가 있다면 두 프로듀서마다 다른 아이디로 설정)
+ 
+<br/>
+
+### 5.4.3 단계별 동작
+
+<img width="600" alt="image" src="https://github.com/mash-up-kr/S3A/assets/55437339/6d3943bb-6c34-4edf-8623-9cb0c5fb3297">
+
+🔼 트랜잭션 코디네이터 찾기
+- 트랜잭션 API를 이용하기 위해 트랜잭션 코디네이터를 찾는다.
+  - 브로커에 위치한다.
+  - PID와 transaction.id를 매핑하고 해당 트랜잭션 전체를 관리한다.
+- 파티션의 리더가 있는 브로커가 트랜잭션 코디네이터의 브로커로 최종 선정된다.
+  - _transaction_state 토픽의 파티션 번호는 transaction.id를 기반으로 해시하여 결정된다.
+- transaction.id가 정확히 하나의 코디네이터만 갖고 있다.
+
+<br/>
+
+<img width="600" alt="image" src="https://github.com/mash-up-kr/S3A/assets/55437339/7def4ef0-ef20-43ec-af3e-6b7fd33c7019">
+
+🔼 프로듀서 초기화
+- 트랜잭션 전송을 위한 InitPidRequest를 트랜잭션 코디네이터로 보낸다. (TID가 설정된 경우 같이 전송)
+- 트랜잭션 코디네이터는 TID, PID를 매핑하고 해당 정보를 트랜잭션 로그에 기록한다.
+- PID 에포크를 한 단계 올리고, 이전의 동일한 PID와 이전 에포크에 대한 쓰기 요청은 무시된다.
+
+<br/>
+
+<img width="600" alt="image" src="https://github.com/mash-up-kr/S3A/assets/55437339/e3851444-186c-4d50-84a0-fed8dd9a3022">
+
+🔼 트랜잭션 시작
+- 프로듀서는 새로운 트랜잭션의 시작을 알린다.
+- 트랜잭션의 코디네이터 관점에서 첫 번째 레코드가 전송될 때까지 트랜잭션이 시작된 것은 아니다.
+
+<br/>
+
+<img width="600" alt="image" src="https://github.com/mash-up-kr/S3A/assets/55437339/f36f38f8-7371-462d-99cb-5f052b7a1b75">
+
+🔼 트랜잭선 상태 추가
+- 프로듀서는 토픽 파티션 정보를 트랜잭션 코디네이터에게 전달하고, 트랜잭션 코디네이터는 해당 정보를 트랜잭션 로그에 기록한다.
+- 트랜잭션의 현재 상태를 Ongoing으로 표시한다.
+- 기본값으로 1분 동안 트랜잭션 상태에 대한 업데이트가 없다면, 해당 트랜잭셔은 실패로 처리된다.
+
+<br/>
+
+<img width="600" alt="image" src="https://github.com/mash-up-kr/S3A/assets/55437339/5233b839-2dcb-4b7d-af9b-9d275d361c43">
+
+🔼 메시지 전송
+- 프로듀서는 대상 토픽의 파티션으로 메시지를 전송한다.
+- P0(파티션0)으로 메시지를 전송했고, 해당 메시지에 PID, 에포크, 시퀀스 번호가 함께 포함되는 상황이다.
+- 브로커가 2개 있는 이유는 트랜잭션 코디네이터가 있는 브로커와 프로듀서가 전송하는 메시지를 받는 브로커가 서로 다르기 때문이다.
+
+<br/>
+
+<img width="600" alt="image" src="https://github.com/mash-up-kr/S3A/assets/55437339/91eb1fac-1e54-45ec-9bb9-7eecf8886d58">
+
+🔼 트랜잭션 종료 요청
+- 메시지 전송을 완료한 프로듀서는 commitTransaction() 메서드 또는 abortTransaction() 메서드 중 하나를 호출한다.
+- 해당 메서드 호출을 통해 트랜잭션이 완료되었음을 트랜잭션 코디네이터에게 알린다.
+- 트랜잭션 코디네이터는 **첫번째 단계**로 트랜잭션 로그에 해당 트랜잭션에 대한 PrepareCommit 또는 PrepareAbort를 기록한다.
+
+<br/>
+
+<img width="600" alt="image" src="https://github.com/mash-up-kr/S3A/assets/55437339/e30f6be2-f634-4ed5-adf2-d2b1ebf342c9">
+
+🔼 사용자 토픽에 표시 요청
+- 트랜잭션 코디네이터는 **두번째 단계**로 트랜잭션 로그에 기록된 토픽의 파티션에 트랜잭션 커밋 표시를 기록한다.
+  - 컨트롤 메시지가 기록한다.
+- 트랜잭션 커밋이 끝나지 않은 메시지는 컨슈머에게 반환하지 않으며, 오프셋의 순서 보장을 위해 트랜잭션 성공/실패를 나타내는 LSO(Last Stable Offset)라는 오프셋을 유지한다.
+
+<br/>
+
+<img width="600" alt="image" src="https://github.com/mash-up-kr/S3A/assets/55437339/7ff67fa5-670f-4e9f-8e93-a067f0b28aad">
+
+🔼 트랜잭션 완료
+- 트랜잭션 코디네이터는 완료됨(commited)이라고 트랜잭션 로그에 기록한다.
+- 프로듀서에게 해당 트랜잭션이 완료됨을 알린 다음 해당 트랜잭션에 대한 처리는 모두 마무리된다.
+
+<br/>
+
+### 5.4.4 예제 실습
