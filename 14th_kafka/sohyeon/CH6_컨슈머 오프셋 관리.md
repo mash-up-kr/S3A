@@ -70,3 +70,140 @@
 <br/>
 
 ## 6.3 스태틱 멤버십
+- 컨슈머의 설정 변경이나 소프트웨어 업데이트로 인해 컨슈머가 재시작되면, 컨슈머 그룹 내의 동일한 컨슈머임에도 새로운 컨슈머로 인식해 새로운 엔티티 ID가 부여되고 이로 인해 컨슈머 그룹의 리밸런싱이 발생한다.
+- 불필요한 리밸런싱을 방어하기 위해 아파치 카프카 2.3부터 **스태틱 멤버십(static membership)** 이라는 개념을 도입되었다.
+- 컨슈머마다 인식할 수 있는 ID를 적용함으로써 다시 합류하더라도 그룹 코디네이터가 기존 구성원임을 인식할 수 있게 한다.
+- 스태틱 멤버십 기능을 적용한다면 session.timout.ms를 기본값보다는 큰 값으로 조정해야 한다. (하트비트 이슈를 피하기 위함)
+
+<br/>
+
+### 실습 (일반)
+- 파이썬3 설치 (파이썬 가상 환경 이용, 파이썬3으로 작성된 컨슈머를 사용하기 위함)
+- 토픽 생성 (peter-test06, 파티션 수 3, 리플리케이션 팩터 수 3)
+- 모든 브로커에 접속하여 깃허브를 클론한 후 `consumer_standard.py` 실행
+
+<br/>
+
+```
+print(
+  'Topic: {}, '
+  'Partition: {}, '
+  'Offset: {}, '
+  'Received message: {}'.format(
+                            msg.topic(),
+                            msg.partition(),
+                            msg.offset(),
+                            msg.value().decode('utf-8')))
+```
+🔼 consumer_standard.py 내용 중 변경 부분
+- 출력 내용을 확인하기 위해 파일 내용 일부 변경
+
+<br/>
+
+```
+some_data_source = []
+for messageCount in range(1, 11):
+  some_data_source.append('Apache Kafka is a distributed streaming platform - %d' % messageCount)
+```
+🔼 producer.py 내용 중 변경 부분
+- 총 10개의 메시지를 보낸다.
+
+<br/>
+
+```
+(venv6) $ python producer.py
+```
+🔼 프로듀서 실행
+
+<br/>
+
+![image](https://github.com/mash-up-kr/S3A/assets/55437339/d4d5319b-6675-4275-882d-9ba012144371)
+
+🔼 프로듀서 실행 후 컨슈머에서 메시지를 읽은 내용
+- 각 컨슈머들이 메시지를 정상적으로 읽었다.
+
+<br/>
+
+```
+$ /usr/local/kafka/bin/kafka-consumer-groups.sh --bootstrap-server peter-kafka01.foo.bar:9092 --group peter-consumer01 --describe
+```
+
+<br/>
+
+![image](https://github.com/mash-up-kr/S3A/assets/55437339/2653705e-b8a0-42f7-af16-4fe99e7398ab)
+
+🔼 해당 컨슈머 그룹의 상세보기 확인
+- 파티션별로 LAG 없이 모든 메시지를 읽어온 것을 확인할 수 있다.
+
+<br/>
+
+<img width="688" alt="image" src="https://github.com/mash-up-kr/S3A/assets/55437339/5a860d95-e473-47f6-872c-2a30c11cf2d1">
+
+🔼 일반 컨슈머 그룹의 리밸런싱 동작(1)
+- 현재 peter-test06 토픽의 파티션이 컨슈머의 프로세스가 실행된 브로커와 매핑된 내용을 확인할 수 있다.
+- peter-kafka01의 컨슈머 프로세스를 강제로 종료한다.
+
+<br/>
+
+![image](https://github.com/mash-up-kr/S3A/assets/55437339/fd22167c-0b49-42ce-a434-2cdbff22617d)
+
+🔼 컨슈머 프로세스 종료 후 그룹 상세보기
+- 그룹 코디네이터는 상황을 인지하고 그룹 내부적으로 리밸런싱이 일어났다.
+
+<br/>
+
+<img width="685" alt="image" src="https://github.com/mash-up-kr/S3A/assets/55437339/3a9f9c52-e7c5-4226-906f-e4435fd82cf1">
+
+🔼 일반 컨슈머 그룹의 리밸런싱 동작(2)
+- 현재 peter-test06 토픽의 파티션이 컨슈머의 프로세스가 실행된 브로커와 매핑된 내용을 확인할 수 있다.
+- 브로커 peter-kafka02의 컨슈머가 담당하고 있던 파티션도 변경됐다. (전체 컨슈머를 대상으로 리밸런싱 동작)
+- 불필요한 리밸런싱은 최대한 줄여야 한다.
+
+<br/>
+
+### 실습 (스태틱 멤버십)
+```
+hostname = socket.gethostname()
+broker = 'peter-kafka01.foo.bar'
+group = 'peter-consumer02'
+topic = 'peter-test06'
+
+c = Consumer({
+  'bootstrap.servers': broker,
+  'group.id': group,
+  'session.timeout.ms': 30000,
+  'group.instance.id': 'consumer-' + hostname,
+  'auto.offset.reset': 'earliest'
+})
+```
+🔼 스태틱 컨슈머 설정
+
+<br/>
+
+```
+(venv6) $ python consumer_static.py
+```
+🔼 모든 브로커에서 스태틱 멤버십 설정이 적용된 컨슈머를 실행
+
+<br/>
+
+<img width="684" alt="image" src="https://github.com/mash-up-kr/S3A/assets/55437339/bca28cf6-585f-4247-b753-175f4b4b33a9">
+
+🔼 스태틱 멤버십이 적용된 컨슈머 그룹의 리밸런싱 동작(1)
+- 현재 peter-test06 토픽의 파티션이 컨슈머의 프로세스가 실행된 브로커와 매핑된 내용을 알 수 있다.
+- 실행 중인 컨슈머 프로세스를 강제로 종료한다.
+  - 종료 후에도 리밸런싱 동작이 일어나지 않는다.
+  - session.timeout.ms 경과 후 리밸런싱 동작 후 새로운 파티션이 할당된다.
+
+<br/>
+
+<img width="680" alt="image" src="https://github.com/mash-up-kr/S3A/assets/55437339/191c04e7-0b36-4212-a399-d0ccadbc930c">
+
+🔼 스태틱 멤버십이 적용된 컨슈머 그룹의 리밸런싱 동작(2)
+- 리밸런싱 동작에 의해 변경된 내용을 확인할 수 있다.
+- 프로세스 종료 전 peter-kafka01 컨슈머가 담당한 파티션 1번이 peter-kafka02 담당으로 변경됐다.
+- 종료된 컨슈머만 제거되고, 담당하던 파티션을 재담당함으로써 총 2번의 리밸런싱 동작이 발생했다.
+
+<br/>
+
+## 6.4 컨슈머 파티션 할당 전략
