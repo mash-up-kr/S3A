@@ -338,3 +338,86 @@ c = Consumer({
 <br/>
 
 ## 6.5 정확히 한 번 컨슈머 동작
+```java
+import java.util.List;
+import java.util.Properties;
+
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.serialization.StringDeserializer;
+
+public class ExactlyOnceConsumer {
+	public static void main(String[] args) {
+		String bootstrapServers = "peter-kafka01.foo.bar:9092";
+		Properties props = new Properties();
+		props.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+		props.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+		props.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+		props.setProperty(ConsumerConfig.GROUP_ID_CONFIG, "peter-consumer-01");
+		props.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+		props.setProperty(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
+		props.setProperty(ConsumerConfig.ISOLATION_LEVEL_CONFIG, "read_committed"); // 정확히 한 번 전송을 위한 설정
+
+		KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
+		consumer.subscribe(List.of("peter-test05"));
+		
+		try {
+			while (true) {
+				ConsumerRecords<String, String> records = consumer.poll(1000);
+				for (ConsumerRecord<String, String> record : records) {
+					System.out.printf("Topic: %s, Partition: %s, Offset: %d, Key: %s, Value: %s\n"
+							, record.topic()
+							, record.partition()
+							, record.offset()
+							, record.key()
+							, record.value()
+					);
+				}
+				consumer.commitAsync();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			consumer.close();
+		}
+	}
+}
+```
+🔼 트랜잭션 컨슈머 예제 코드 (ExactlyOnceConsumer.java)
+- 일반 컨슈머 코드에서 `ISOLATION_LEVEL_CONFIG` 설정만 추가하면 트랜잭션 컨슈머로 동작한다.
+- 트랜잭션 컨슈머는 트랜잭션이 완료된 메시지만 읽을 수 있다. (트랜잭션 코디네이터와 통신 X)
+
+<br/>
+
+### 실습
+```
+$ java -jar ExactlyOnceConsumer.jar
+```
+🔼 JAR 파일을 이용한 컨슈머 실행
+
+<br/>
+
+```
+$ java -jar ExactlyOnceProducer.jar
+```
+🔼 프로듀서 실행
+- 메시지를 전송한다.
+
+<br/>
+
+```
+Topic: peter-test05, Partition: 0, Offset: 2, Key: null, Value: Apache Kafka is a distributed streaming platform - 0
+```
+🔼 출력 결과
+- 한 건의 메시지를 전송했는데 오프셋이 2로 표시된다.
+- 트랜잭션의 종료를 표시하기 위해 메시지 전송 후 커밋 또는 중단에 대한 표시를 남기는 트랜잭션 메시지가 추가되기 때문이다.
+
+<br/>
+
+### 트랜잭션 동작
+- 컨슈머는 트랜잭션 코디네이터와 통신하는 부분이 없으므로 **정확하게 메시지를 한 번 가져오는지는 보장할 수 없다.**
+- 컨슈머에 의해 컨슘된 메시지가 다른 싱크 저장소로 중복 저장될 수도 있다.
+- 정확히 한 번 처리가 가능하려면 `컨슘 - 메시지 처리 - 프로듀싱` 동작이 모두 하나의 트랜잭션으로 처리되어야 한다.
