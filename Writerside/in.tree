@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE instance-profile
+        SYSTEM "https://resources.jetbrains.com/writerside/1.0/product-profile.dtd">
+
+<instance-profile id="in"
+                 name="Instance Name" start-page="README.md">
+
+    <toc-element topic="README.md"/>
+    <toc-element toc-title="14th_optimizing-java">
+        <toc-element topic="14th_optimizing-java_README.md"/>
+        <toc-element toc-title="week-4">
+            <toc-element toc-title="원영">
+                <toc-element topic="원영_week4.md"/>
+            </toc-element>
+            <toc-element toc-title="경환">
+                <toc-element topic="경환_week4.md"/>
+            </toc-element>
+            <toc-element toc-title="종민">
+                <toc-element topic="종민_week4.md"/>
+            </toc-element>
+        </toc-element>
+        <toc-element toc-title="week-3">
+            <toc-element toc-title="원영">
+                <toc-element topic="원영_week3.md"/>
+            </toc-element>
+            <toc-element toc-title="경환">
+                <toc-element topic="경환_week3.md"/>
+            </toc-element>
+            <toc-element toc-title="종민">
+                <toc-element topic="종민_week3.md"/>
+            </toc-element>
+        </toc-element>
+        <toc-element toc-title="week-2">
+            <toc-element toc-title="세원">
+                <toc-element topic="세원_week2.md"/>
+            </toc-element>
+            <toc-element toc-title="원영">
+                <toc-element topic="원영_week2.md"/>
+            </toc-element>
+            <toc-element toc-title="경환">
+                <toc-element topic="경환_week2.md"/>
+            </toc-element>
+        </toc-element>
+        <toc-element toc-title="week-1">
+            <toc-element toc-title="세원">
+                <toc-element topic="세원_week1.md"/>
+            </toc-element>
+            <toc-element toc-title="원영">
+                <toc-element topic="원영_week1.md"/>
+            </toc-element>
+            <toc-element toc-title="경환">
+                <toc-element topic="경환_week1.md"/>
+            </toc-element>
+            <toc-element toc-title="종민">
+                <toc-element topic="종민_week1.md"/>
+            </toc-element>
+        </toc-element>
+    </toc-element>
+    <toc-element toc-title="13th_kafka">
+        <toc-element topic="13th_kafka_README.md"/>
+        <toc-element toc-title="gyunny">
+            <toc-element topic="gyunny_2.md"/>
+            <toc-element topic="gyunny_3.md"/>
+            <toc-element topic="gyunny_4.md"/>
+            <toc-element topic="gyunny_1.md"/>
+            <toc-element topic="gyunny_5.md"/>
+        </toc-element>
+        <toc-element toc-title="garden">
+            <toc-element topic="garden_2.md"/>
+            <toc-element topic="garden_6.md"/>
+            <toc-element topic="garden_3.md"/>
+            <toc-element topic="garden_4.md"/>
+            <toc-element topic="garden_1.md"/>
+            <toc-element topic="5.md"/>
+        </toc-element>
+        <toc-element toc-title="jongmin">
+            <toc-element topic="jongmin_2.md"/>
+            <toc-element topic="7.md"/>
+            <toc-element topic="jongmin_4.md"/>
+            <toc-element topic="jongmin_1.md"/>
+        </toc-element>
+        <toc-element toc-title="seongyunkim">
+            <toc-element topic="seongyunkim_2.md"/>
+            <toc-element topic="seongyunkim_6.md"/>
+            <toc-element topic="seongyunkim_3.md"/>
+            <toc-element topic="seongyunkim_4.md"/>
+            <toc-element topic="seongyunkim_1.md"/>
+        </toc-element>
+        <toc-element toc-title="bohgyu">
+            <toc-element topic="2.md"/>
+            <toc-element topic="6.md"/>
+            <toc-element topic="3.md"/>
+            <toc-element topic="8.md"/>
+            <toc-element topic="9.md"/>
+            <toc-element topic="4.md"/>
+            <toc-element topic="1.md"/>
+        </toc-element>
+        <toc-element toc-title="kyunghwan">
+            <toc-element topic="kyunghwan_2.md"/>
+            <toc-element topic="kyunghwan_6.md"/>
+            <toc-element topic="kyunghwan_3.md"/>
+            <toc-element topic="kyunghwan_8.md"/>
+            <toc-element topic="kyunghwan_4.md"/>
+            <toc-element topic="kyunghwan_1.md"/>
+            <toc-element topic="kyunghwan_5.md"/>
+        </toc-element>
+    </toc-element>
+    <toc-element toc-title="13th_toby-spring">
+        <toc-element topic="13th_toby-spring_README.md"/>
+        <toc-element toc-title="Vol_1_스프링의_이해와_원리">
+            <toc-element topic="4장_예외.md"/>
+            <toc-element topic="7장_스프링 핵심기술의 응용-2.md"/>
+            <toc-element topic="5장_서비스_추상화.md"/>
+            <toc-element topic="8장_스프링이란.md"/>
+            <toc-element topic="2장_테스트.md"/>
+            <toc-element topic="6장_AOP-2.md"/>
+            <toc-element topic="3장_템플릿.md"/>
+        </toc-element>
+    </toc-element>
+    <toc-element toc-title="14th_effective-kotlin">
+        <toc-element topic="item1-4.md"/>
+        <toc-element topic="item5-10.md"/>
+        <toc-element topic="item11-15.md"/>
+        <toc-element topic="14th_effective-kotlin_README.md"/>
+    </toc-element>
+    <toc-element toc-title="13th_DDD">
+        <toc-element topic="13th_DDD_README.md"/>
+        <toc-element toc-title="Week-4">
+            <toc-element toc-title="예원">
+                <toc-element topic="예원_week4.md"/>
+            </toc-element>
+            <toc-element toc-title="정민">
+                <toc-element topic="정민_week4.md"/>
+            </toc-element>
+            <toc-element toc-title="성찬">
+                <toc-element topic="성찬_week4.md"/>
+            </toc-element>
+            <toc-element toc-title="성민">
+                <toc-element topic="성민_week4.md"/>
+            </toc-element>
+            <toc-element toc-title="보배">
+                <toc-element topic="week4.md"/>
+            </toc-element>
+            <toc-element toc-title="재민">
+                <toc-element topic="재민_week4.md"/>
+            </toc-element>
+        </toc-element>
+        <toc-element toc-title="Week-3">
+            <toc-element toc-title="예원">
+                <toc-element topic="예원_week3.md"/>
+            </toc-element>
+            <toc-element toc-title="정민">
+                <toc-element topic="정민_week3.md"/>
+            </toc-element>
+            <toc-element toc-title="성찬">
+                <toc-element topic="성찬_week3.md"/>
+            </toc-element>
+            <toc-element toc-title="성민">
+                <toc-element topic="성민_week3.md"/>
+            </toc-element>
+            <toc-element toc-title="보배">
+                <toc-element topic="week3.md"/>
+            </toc-element>
+            <toc-element toc-title="재민">
+                <toc-element topic="재민_week3.md"/>
+            </toc-element>
+        </toc-element>
+        <toc-element toc-title="Week-2">
+            <toc-element toc-title="예원">
+                <toc-element topic="예원_week2.md"/>
+            </toc-element>
+            <toc-element toc-title="정민">
+                <toc-element topic="정민_week2.md"/>
+            </toc-element>
+            <toc-element toc-title="성찬">
+                <toc-element topic="성찬_week2.md"/>
+            </toc-element>
+            <toc-element toc-title="성민">
+                <toc-element topic="성민_week2.md"/>
+            </toc-element>
+            <toc-element toc-title="보배">
+                <toc-element topic="week2.md"/>
+            </toc-element>
+            <toc-element toc-title="재민">
+                <toc-element topic="재민_week2.md"/>
+            </toc-element>
+        </toc-element>
+        <toc-element toc-title="Week-5">
+            <toc-element toc-title="예원">
+                <toc-element topic="예원_week5.md"/>
+            </toc-element>
+            <toc-element toc-title="정민">
+                <toc-element topic="정민_week5.md"/>
+            </toc-element>
+            <toc-element toc-title="성찬">
+                <toc-element topic="성찬_week5.md"/>
+            </toc-element>
+            <toc-element toc-title="성민">
+                <toc-element topic="week5.md"/>
+            </toc-element>
+            <toc-element toc-title="재민">
+                <toc-element topic="재민_week5.md"/>
+            </toc-element>
+        </toc-element>
+        <toc-element toc-title="Week-7">
+            <toc-element toc-title="예원">
+                <toc-element topic="예원_week7.md"/>
+            </toc-element>
+            <toc-element toc-title="정민">
+                <toc-element topic="week7.md"/>
+            </toc-element>
+            <toc-element toc-title="성찬">
+                <toc-element topic="성찬_week7.md"/>
+            </toc-element>
+            <toc-element toc-title="성민">
+                <toc-element topic="성민_week7.md"/>
+            </toc-element>
+            <toc-element toc-title="보배">
+                <toc-element topic="week7.md"/>
+            </toc-element>
+            <toc-element toc-title="재민">
+                <toc-element topic="재민_week7.md"/>
+            </toc-element>
+        </toc-element>
+        <toc-element toc-title="Week-6">
+            <toc-element toc-title="예원">
+                <toc-element topic="예원_week6.md"/>
+            </toc-element>
+            <toc-element toc-title="정민">
+                <toc-element topic="week6.md"/>
+            </toc-element>
+            <toc-element toc-title="성찬">
+                <toc-element topic="성찬_week6.md"/>
+            </toc-element>
+            <toc-element toc-title="성민">
+                <toc-element topic="성민_week6.md"/>
+            </toc-element>
+            <toc-element toc-title="보배">
+                <toc-element topic="week6.md"/>
+            </toc-element>
+            <toc-element toc-title="재민">
+                <toc-element topic="[DDD] 박재민 11~12장.md"/>
+            </toc-element>
+        </toc-element>
+        <toc-element toc-title="Week-1">
+            <toc-element toc-title="예원">
+                <toc-element topic="yaeoni.md"/>
+            </toc-element>
+            <toc-element toc-title="정민">
+                <toc-element topic="정민_week1.md"/>
+            </toc-element>
+            <toc-element toc-title="성찬">
+                <toc-element topic="성찬_week1.md"/>
+            </toc-element>
+            <toc-element toc-title="성민">
+                <toc-element topic="성민_week1.md"/>
+            </toc-element>
+            <toc-element toc-title="보배">
+                <toc-element topic="week1.md"/>
+            </toc-element>
+            <toc-element toc-title="재민">
+                <toc-element topic="재민_week1.md"/>
+            </toc-element>
+        </toc-element>
+        <toc-element toc-title="Week-8">
+            <toc-element toc-title="예원">
+                <toc-element topic="예원_week8.md"/>
+            </toc-element>
+            <toc-element toc-title="정민">
+                <toc-element topic="정민_week8.md"/>
+            </toc-element>
+            <toc-element toc-title="성민">
+                <toc-element topic="week8.md"/>
+            </toc-element>
+            <toc-element toc-title="재민">
+                <toc-element topic="재민_week8.md"/>
+            </toc-element>
+        </toc-element>
+    </toc-element>
+    <toc-element toc-title="14th_kafka">
+        <toc-element topic="14th_kafka_README.md"/>
+        <toc-element toc-title="dohyeon">
+            <toc-element topic="CH6_컨슈머의 내부 동작 원리와 구현.md"/>
+            <toc-element topic="CH3_카프카 기본 개념과 구조.md"/>
+            <toc-element topic="CH5_프로듀서의 내부 동작 원리와 구현.md"/>
+            <toc-element topic="CH2_카프카 환경 구성.md"/>
+            <toc-element topic="CH4_카프카의 내부 동작 원리와 구현.md"/>
+            <toc-element topic="CH1_카프카 개요.md"/>
+        </toc-element>
+        <toc-element toc-title="sungmin">
+            <toc-element topic="sungmin_CH3_카프카 기본 개념과 구조.md"/>
+            <toc-element topic="sungmin_CH5_프로듀서의 내부 동작 원리와 구현.md"/>
+            <toc-element topic="sungmin_CH2_카프카 환경 구성.md"/>
+            <toc-element topic="sungmin_CH1_카프카 개요.md"/>
+        </toc-element>
+        <toc-element toc-title="sunwoo">
+            <toc-element topic="sunwoo_CH3_카프카 기본 개념과 구조.md"/>
+            <toc-element topic="sunwoo_CH2_카프카 환경 구성.md"/>
+            <toc-element topic="sunwoo_CH4_카프카의 내부 동작 원리와 구현.md"/>
+            <toc-element topic="sunwoo_CH1_카프카 개요.md"/>
+        </toc-element>
+        <toc-element toc-title="sohyeon">
+            <toc-element topic="sohyeon_CH5_프로듀서의 내부 동작 원리와 구현.md"/>
+            <toc-element topic="sohyeon_CH2_카프카 환경 구성.md"/>
+            <toc-element topic="CH3_카프카 기본 개념과 구조.md"/>
+            <toc-element topic="sohyeon_CH4_카프카의 내부 동작 원리와 구현.md"/>
+            <toc-element topic="sohyeon_CH1_카프카 개요.md"/>
+        </toc-element>
+        <toc-element toc-title="junhyoung">
+            <toc-element topic="junhyoung_CH3_카프카 기본 개념과 구조.md"/>
+            <toc-element topic="junhyoung_CH5_프로듀서의 내부 동작 원리와 구현.md"/>
+            <toc-element topic="junhyoung_CH2_카프카 환경 구성.md"/>
+            <toc-element topic="junhyoung_CH4_카프카의 내부 동작 원리와 구현.md"/>
+            <toc-element topic="junhyoung_CH1_카프카 개요.md"/>
+        </toc-element>
+        <toc-element toc-title="jaemin">
+            <toc-element topic="Kafka 2주차.md"/>
+            <toc-element topic="Kafka 1주차.md"/>
+            <toc-element topic="Kafka 3주차.md"/>
+        </toc-element>
+    </toc-element>
+</instance-profile>
