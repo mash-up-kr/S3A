@@ -132,6 +132,7 @@ $ cat /usr/local/kafka/logs/server.log
 <br/>
 
 |로그 파일 이름|설명|
+|---|---|
 |server.log|브로커 설정 정보와 정보성 로그 등을 기록함|
 |state-change.log|컨트롤러로부터 받은 정보를 기록함|
 |kafka-request.log|클라이언트로부터 받은 정보를 기록함|
