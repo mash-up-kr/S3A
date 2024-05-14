@@ -393,3 +393,37 @@ scrap_configs:
 <br/>
 
 ### 7.2.3 카프카 익스포터
+
+> **카프카 익스포터 다운로드**
+
+```
+$ cd /home/ec2-user/kafka2/chapter2/ansible_playbook
+$ ansible-playbook -i hosts kafka-exporter.yml
+```
+
+<br/>
+
+> **프로메테우스 환경 설정 파일에서 카프카 익스포터 추가**
+
+```
+- job_name: 'peter-kafak-exporter'
+  static_configs:
+    - targets:
+      - peter-kafka01.foo.bar:9308
+      - peter-kafka02.foo.bar:9308
+      - peter-kafka03.foo.bar:9308
+```
+🔼 prometheus.yml 설정 파일에 추가한 코드부
+
+<br/>
+
+```
+$ sudo docker restart prometheus
+```
+🔼 재시작
+
+<br/>
+
+> **그라파나에서 대시보드 추가**
+
+- 이전의 대시보드 추가 과정을 참고하여 대시보드를 추가한다.
