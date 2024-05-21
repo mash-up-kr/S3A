@@ -185,5 +185,171 @@
 <br/>
 
 ## 8.3 카프카의 확장
+- 카프카의 사용량이 폭발적으로 증가해서 카프카를 확장해야 하는 경우를 재현해본다.
+- 실습용 토픽을 생성한다.
+  ```
+  $ /usr/local/kafka/bin/kafka-topics.sh --bootstrap-server peter-kafka01.foo.bar:9092 --create --topic peter-scaleout1 --partitions 4 --replication-factor 1
+  ```
 
-## 
+- 토픽 상세보기를 실행한다.
+  ```
+  /usr/local/kafka/bin/kafka-topics.sh --bootstrap-server peter-kafka01.foo.bar:9092 --describe --topic peter-scaleout1
+  ```
+  - 출력된 내용을 그림으로 표현하면 아래와 같다.
+    <br/><img alt="image" width="400" src="https://github.com/mash-up-kr/S3A/assets/55437339/52501887-cf4a-4afa-baf8-64034994246b"/>
+
+    🔼 peter-scaleout1 토픽 배치
+    - 토픽은 총 4개 파티션으로, 브로커는 3대로 구성되어 있다.
+   
+- 카프카 확장 실습을 위해 브로커를 한 대 더 추가하고, 주키퍼 서버 중 하나인 peter-zk03 서버를 이용한다.
+  ```
+  $ cd ansible_playbook # 배포 서버(peter-ansible01)에 접속한 후 깃허브 예제 파일을 다운로드해둔 경로로 이동
+  $ ansible-playbook -i hosts kafka-scaleout.yml # peter-zk03 서버에 카프카 설치
+  ```
+
+- peter-zk03 서버에 접속한 후 브로커 설정 파일을 편집한다.
+  ```
+  $ sudo vi /usr/local/kafka/config/server.properties
+  ```
+  - broker.id=4가 잘 지정되어 있는지 확인한다.
+  - systemctl 명령어를 이용해 출력 결과 중 active (running)이 확인하여 정상적으로 실행됐는지 확인한다.
+ 
+<br/>
+
+<img alt="image" width="500" src="https://github.com/mash-up-kr/S3A/assets/55437339/417b1fc8-71d1-49ee-8d1c-2480734d3114" />
+
+🔼 4번 브로커(peter-zk03)를 추가한 상태
+- 브로커 추가 후 토픽의 파티션들은 관리자가 수작업으로 고르게 분산시켜야 한다.
+
+<br/>
+
+- 토픽을 추가한다.
+  ```
+  $ /usr/local/kafka/bin/kafka-topics.sh --bootstrap-server peter-kafka01.foo.bar:9092 --create --topic peter-scaleout2 --partitions 4 --replication-factor 1
+  ```
+  - 토픽의 파티션별 브로커 위치를 확인하기 위함이다.
+ 
+- 토픽의 상세보기를 실행한다.
+  ```
+  $ /usr/local/kafka/bin/kafka-topics.sh --bootstrap-server peter-kafka01.foo.bar:9092 --describe --topic peter-scaleout2
+  ```
+  - 파티션들이 어느 브로커에 위치하고 있는지 확인한다.
+  - 해당 토픽의 파티션 수는 총 4개로 새롭게 확장한 브로커 4번을 포함해 브로커 ID당 하나씩 고르게 분포되어 있음을 알 수 있다.
+ 
+<br/>
+
+<img alt="image" width="500" src="https://github.com/mash-up-kr/S3A/assets/55437339/17890aa6-4c2a-404b-9509-122f4ccb4e40"/>
+
+🔼 peter-scaleout2 토픽을 추가한 후의 상태
+- peter-scaleout1 토픽은 파티션이 분산되지 않고 그대로 유지되고 있다.
+- peter-scaleout2 토픽은 브로커 추가 후 생성했으므로 고르게 분산되어있다.
+- 부하 분산이 목적인 경우에 브로커 추가 후 추가된 브로커에도 기존의 파티션들을 할당해야 한다.
+
+<br/>
+
+### 8.3.1 브로커 부하 분산
+- 해당 JSON 포맷에 분산시킬 대상 토픽을 추가해 작성한다.
+  ```json
+  {"topics":
+    [{"topic": "peter-scaleout1"}],
+    "version": 1
+  }
+  ```
+  🔼 하나의 토픽을 정의한 JSON 파일 (reassign-partitions-topic.json)
+  - 파티션 이동 작업을 위해 정해진 JSON 포맷으로 파일을 생성해야 한다.
+ 
+- 파티션을 분산시킬 브로커 리스트를 지정한다.
+  ```
+  $ /usr/local/kafka/bin/kafka-reassign-partitions.sh --bootstrap-server peter-kafka01.foo.bar:9092 --generate --topics-to-move-json-file reaasign-partitions-topic.json --broker-list "1,2,3,4"
+  ```
+  - 1, 2, 3, 4번 브로커를 모두 지정했다.
+  - 출력 결과를 통해 peter-scaleout1 토픽의 현재 설정된 파티션 배치를 가장 먼저 보여주고, 이후에 제안하는 파티션 배치가 출력됐음을 확인할 수 있다.
+ 
+- 제안된 파티션 배치의 설정을 복사한 후 새로운 파일을 생성한다.
+  ```
+  {
+    "version": 1,
+    "partitions": [
+      {
+        "topic": "peter-scaleout1",
+        "partition": 0,
+        "replicas": [
+          2
+        ],
+        "log_dirs": [
+          "any"
+        ]
+      },
+      {
+        "topic": "peter-scaleout1",
+        "partition": 1,
+        "replicas": [
+          3
+        ],
+        "log_dirs": [
+          "any"
+        ]
+      },
+        {
+        "topic": "peter-scaleout1",
+        "partition": 2,
+        "replicas": [
+          4
+        ],
+        "log_dirs": [
+          "any"
+        ]
+      },
+        {
+        "topic": "peter-scaleout1",
+        "partition": 3,
+        "replicas": [
+          1
+        ],
+        "log_dirs": [
+          "any"
+        ]
+      },
+    ]
+  }
+  ```
+  🔼 제안된 파티션 배치 (move.json)
+
+- peter-scaleout1 토픽에 대해 파티션 배치를 실행한다.
+  ```
+  $ /usr/local/kafka/bin/kafka-reassign-partitions.sh --bootstrap-server peter-kafka01.foo.bar:9092 --reassignment-json-file move.json --execute
+  ```
+  - move.json 파일을 정의해 파티션 배치를 실행한다.
+  - 출력 내용을 통해 재배치가 성공적으로 실행됐음을 알 수 있다.
+ 
+- 토픽 상세보기를 실행한다.
+  ```
+  $ /usr/local/kafka/bin/kafka-topics.sh --bootstrap-server peter-kafka01.foo.bar:9092 --describe --topic peter-scaleout1
+  ```
+  - 출력 내용을 통해 2번 파티션이 4번 브로커에 배치됐음을 알 수 있다.
+ 
+<br/>
+
+<img alt="image" width="500" src="https://github.com/mash-up-kr/S3A/assets/55437339/87a069bf-047d-48f3-b36e-61d976f4641c"/>
+
+🔼 파티션 재배치 이후 상태
+- 이제 4번 브로커도 peter-scaleout1 토픽의 데이터를 읽고 쓰는 역할을 가진다.
+- 브로커 간의 부하 분산 및 밸런스를 맞추려면 관리자는 기존 파티션들이 모든 브로커에 고르게 분산되도록 수동으로 분산 작업을 진행해야 한다.
+
+<br/>
+
+### 8.3.2 분산 배치 작업 시 주의사항
+- 카프카의 사용량이 낮은 시간에 진행하는 것이 권장된다.
+  - 카프카에서 파티션이 재배치되는 과정은 브로커 내부적으로 리플리케이션하는 동작이 일어난다.
+  
+    <img alt="image" width="300" src="https://github.com/mash-up-kr/S3A/assets/55437339/c47803ed-3f58-4697-9fd7-895e91c1b9d1" />
+  
+    🔼 파티션 배치 작업
+    - (1) 이동 대상 파티션을 목적지 브로커에 리플리케이션하게 된다.
+    - (2) 리플리케이션 완료 후 이동하기 전 브로커에 위치한 파티션은 삭제된다.
+ 
+- 해당 토픽의 메시지들을 모든 컨슈머가 최근의 내용까지 모두 컨슘했고, 앞으로 재처리할 일이 없다면, 최근 메시지를 제외한 나머지 메시지들은 모두 삭제해도 무방하다.
+  - 파티션의 크기를 줄인 후 재배치 작업을 진행한다면 기존 대비 브로커의 부하나 네트워크 사용량을 줄일 수 있다.
+ 
+- 파티션 재배치 작업 시 단 하나의 토픽만 진행한다.
+  - 최대한 카프카의 안전성을 목표로 한다면 한 번에 하나의 토픽만 진행하는 것이 권장된다.
