@@ -320,3 +320,193 @@ ssl.truststore.password=peterpass
 <br/>
 
 ### 9.3.1 커버로스 구성
+
+```bash
+$ cd ansible_playbook
+$ ansible-playbook -i hosts keyberos.yml
+```
+🔼 커버로스 설치
+
+<br/>
+
+```bash
+$ sudo kadmin.local -q "add_principal -randkey peter01@FOO.BAR"
+$ sudo kadmin.local -q "add_principal -randkey peter02@FOO.BAR"
+$ sudo kadmin.local -q "add_principal -randkey admin@FOO.BAR"
+```
+🔼 유저 생성
+- 커버로스에서 사용할 유저를 생성한다.
+- peter01, peter02, admin이라는 총 3명의 유저를 생성한다.
+
+<br/>
+
+```bash
+$ sudo kadmin.local -q "add_principal -randkey kafka/peter-kafka01.foo.bar@FOO.BAR"
+$ sudo kadmin.local -q "add_principal -randkey kafka/peter-kafka02.foo.bar@FOO.BAR"
+$ sudo kadmin.local -q "add_principal -randkey kafka/peter-kafka03.foo.bar@FOO.BAR"
+```
+🔼 프린시펄 생성
+- kafka 서비스를 위한 프린시펄을 생성한다.
+- 프린시펄의 형식은 `서비스명/각 브로커 호스트네임`이다.
+
+<br/>
+
+```bash
+$ mkdir -p /home/ec2-user/keytabs/
+$ sudo kadmin.local -q "ktadd -k /home/ec2-user/keytabs/peter01.user.keytab peter@FOO.BAR"
+$ sudo kadmin.local -q "ktadd -k /home/ec2-user/keytabs/peter02.user.keytab peter@FOO.BAR"
+$ sudo kadmin.local -q "ktadd -k /home/ec2-user/keytabs/admin.user.keytab admin@FOO.BAR"
+$ sudo kadmin.local -q "ktadd -k /home/ec2-user/keytabs/peter-kafka01.service.keytab kafka/peter-kafka01 foo.bar@FOO.BAR"
+$ sudo kadmin.local -q "ktadd -k /home/ec2-user/keytabs/peter-kafka02.service.keytab kafka/peter-kafka02 foo.bar@FOO.BAR"
+$ sudo kadmin.local -q "ktadd -k /home/ec2-user/keytabs/peter-kafka03.service.keytab kafka/peter-kafka03 foo.bar@FOO.BAR"
+```
+🔼 키탭 생성
+- 키탭 파일을 이용하면 커버로스 인증 시 별도의 비밀번호를 입력하지 않고도 원격 시스템에 인증할 수 있다.
+
+<br/>
+
+```bash
+$ sudo chown -R ec2-user.ec2-user keytabs/
+```
+🔼 파일 권한 변경
+- 파일의 소유자를 ec-user로 변경한다.
+
+<br/>
+
+### 9.3.2 키탭을 이용한 인증
+
+```bash
+$ scp -i keypair.pem -r peter-zk01.foo.bar:~/keytabs /home/ec2-user
+$ sudo mv keytabs /usr/local/kafka
+```
+🔼 키탭 복사
+- peter-zk01 서버로부터 keytabs 디렉토리를 복사한다.
+- /home/ec2-user 경로 하위로 keytabs 폴더가 복사되고, 폴더를 /usr/local/kafka로 이동한다.
+- 동일한 방법으로 모든 브로커에서 복사를 진행한다.
+
+<br/>
+
+```bash
+$ kinit -kt /usr/local/kafka/keytabs/peter01.user.keytab peter01
+```
+🔼 티켓 발급
+- kafka01 서버에 접속한 후 키탭 파일들이 있는 경로로 이동하여 티켓을 발급받는다.
+
+<br/>
+
+```
+Ticket cache: FILE:/tmp/krb5cc_1000
+Default principal: peter01@FOO.BAR # 프린시펄 이름을 확인한다.
+
+Valid starting    Expires    Service principal # Valid Starting은 티켓이 발급된 시각을 의미하며, 발급된 티켓은 만료 기한이 있다. Expires는 티켓의 만료 기한을 의미한다. 현재 커버로스에 설정된 만료 기한은 24시간이므로 시작 시각과 24시간 차이가 나는지 확인한다.
+...
+```
+- `klist` 명령어를 이용해 티켓 발급 내역을 확인할 수 있다.
+
+<br/>
+
+```bash
+$ kinit -kt /usr/local/kafka/keytabs/peter-kafka01.service.keytab kafka/peter-kafka01.foo.bar
+```
+🔼 티켓 발급
+- kafka 서비스로 티켓을 발급받는다.
+- 티켓을 확인해보면 프린시펄 네임만 다르고 나머지 내용은 위와 비슷하다.
+
+<br/>
+
+### 9.3.3 브로커 커버로스 설정
+
+```
+listners=PLAINTEXT://0.0.0.0:9092,SSL://0.0.0.0:9093,SASL_PLAINTEXT://0.0.0.0:9094
+advertised.listners=PLAINTEXT://peter-kafka01.foo.bar:9092,SSL://peter-kafka01.foo.bar:9093,SASL_PLAINTEXT://peter-kafka01.foo.bar:9094
+
+security.inter.broker.protocol=SASL_PLAINTEXT
+sasl.mechanism.inter.broker.protocol=GSSAPI
+sasl.enabled.mechanism=GSSAPI
+sasl.kerberos.service.name=kafka
+```
+🔼 커버로스 설정 적용을 위한 peter-kafka01의 server.properties 파일 일부
+- `sasl.kerberos.service.name` 값은 커버로스 생성 시 만들었던 kafka 서비스네임과 정확하게 일치시켜줘야 한다.
+
+<br/>
+
+```
+KafkaServer {
+  com.sun.security.auth.module.Krb5LoginModule required
+  useKeyTab=true
+  storeKey=true
+  keyTab="/usr/local/kafka/keytabs/peter-kafka01.service.keytab"
+  principal="kafka/peter-kafka01.foo.bar@FOO.BAR";
+};
+```
+🔼 peter-kafka01의 kafka_server_jaas.conf 파일
+- `JAAS`: 자바 애플리케이션의 유연성을 위해 사용자 인증에 대한 부분을 분리해 독립적으로 관리할 수 있는 표준 API
+- JAAS의 설정 파일 수정하여 인증을 적용할 수 있다.
+
+<br/>
+
+```
+KAFKA_OPTS="-Djava.security.auth.login.config=/usr/local/kafka/config/kafka_server_jaas.conf"
+```
+🔼 KAFKA_OPTS 추가 설정
+- jmx 파일을 열어 환경변수에 설정을 추가한다.
+
+<br/>
+
+```bash
+$ sudo systemctl restart kafka-server
+```
+🔼 브로커 재시작
+
+<br/>
+
+```bash
+$ sudo netstat -ntlp | grep 9094
+```
+- 커버로스 통신으로 설정한 9094 포트가 잘 실행되면 커버로스로 통신할 준비를 마친 것이다.
+
+<br/>
+
+### 9.3.4 클라이언트 커버로스 설정
+
+```
+KafkaClient {
+  com.sun.security.auth.module.Krb5LoginModule required
+  useTicketCache=true;
+};
+```
+🔼 카프카 명령어 실행을 위한 kafka_client_jaas.conf 파일
+- jaas 설정 파일을 추가한다.
+
+<br/>
+
+```
+$ export KAFKA_OPTS="-Djava.security.auth.login.config=/home/ec2-user/kafka_client_jaas.conf"
+```
+- KAFKA_OPTS 환경 변수를 이용해 jaas 설정 파일을 로드한다.
+
+<br/>
+
+```
+sasl.mechanism.inter.broker.protocol=GSSAPI
+security.protocol=SASL_PLAINTEXT
+sasl.kerberos.service.name=kafka
+```
+🔼 콘솔 프로듀서와 콘솔 컨슈머를 위한 kerberos.config 파일
+- 커버로스 설정을 추가한다.
+
+<br/>
+
+```bash
+$ kinit -kt /usr/local/kafka/keytabs/peter01.user.keytab peter01
+```
+🔼 티켓 발급
+
+<br/>
+
+- 프로듀서로 메시지를 전송하면 컨슈머가 메시지를 잘 읽어옴을 확인할 수 있다.
+- 티켓 삭제 후, 컨슈머가 메시지를 읽으려고 하면 에러가 발생하는 것을 확인할 수 있다. (인증 관련 오류)
+
+<br/>
+
+## 9.4 ACL을 이용한 카프카 권한 설정
