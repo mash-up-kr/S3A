@@ -510,3 +510,83 @@ $ kinit -kt /usr/local/kafka/keytabs/peter01.user.keytab peter01
 <br/>
 
 ## 9.4 ACL을 이용한 카프카 권한 설정
+```
+security.inter.broker.protocol=SASL_PLAINTEXT
+sasl.mechanism.inter.broker.protocol=GSSAPI
+security.protocol=SASL_PLAINTEXT
+sasl.kerberos.service.name=kafka
+# 아래 내용 추가
+authorizer.class.name=kafka.security.authorizer.AclAuthorizer # 권한을 위한 클래스
+super.users=User:admin;User:kafka # 모든 권한을 갖는 슈퍼유저 권한 유저
+```
+🔼 카프카 ACL을 위한 추가 설정
+- `server.properties` 파일을 수정한다.
+- 파일 수정 후 브로커를 재시작한다.
+
+<br/>
+
+```bash
+$ unset KAFKA_OPTS
+$ /usr/local/kafka/bin/kafka-topics.sh --zookeeper peter-zk01.foo.bar:2181 --create --topic peter-test09 --partitions 1 --replication-factor 1
+$ /usr/local/kafka/bin/kafka-topics.sh --zookeeper peter-zk01.foo.bar:2181 --create --topic peter-test10 --partitions 1 --replication-factor 1
+```
+- KAFKA_OPTS 환경 변수 설정 초기화 후 토픽 2개를 생성한다.
+
+<br/>
+
+### 9.4.2 유저별 권한 설정
+
+<img alt="image" width="500" src="https://github.com/mash-up-kr/S3A/assets/55437339/56778f56-0076-4b8c-893b-a62fc98209e9"/>
+
+🔼 유저별 권한 설정 구성도
+- peter01 유저는 peter-test09 토픽에 대해 읽기와 쓰기 가능
+- peter02 유저는 peter-test10 토픽에 대해 읽기와 쓰기 가능
+- admin 유저는 peter-test09, peter-test10 토픽에 대해 읽기와 쓰기 가능
+
+<br/>
+
+```bash
+$ /usr/local/kafka/bin/kafka-acl.sh --authorizer-properties zookeeper.connect=peter-zk01.foo.bar:2181 --add --allow-principal User:peter01 --operation Read --operation Wrtie --operation DESCRIBE --topic peter-test09
+```
+- peter01 유저에 대해 ACL 규칙을 생성한다.
+- 같은 명령어로 peter02 유저에 대해서도 ACL 규칙을 생성한다.
+
+<br/>
+
+```
+$ /usr/local/kafka/bin/kafka-acls.sh --authorizer-properties zookeeper.connect=peter-zk01.foo.bar:2181 --list
+```
+- ACL 규칙의 리스트를 확인할 수 있다.
+
+<br/>
+
+```
+$ kinit -kt /usr/local/kafka/keytabs/peter01.user.keytab peter01
+$ export KAFKA_OPTS="-Djava.security.auth.login.config=/home/ec2-user/kafka_client_jaas.conf"
+$ /usr/local/kafka/bin/kafka-console-producer.sh --bootstrap-server peter-kafka01.foo.bar:9094 --topic peter-test09 --producer.config kerberos.config
+> peter-test09 message!
+```
+- peter01 유저의 티켓을 발급받은 후 콘솔 프로듀서를 이용해 peter-test09 토픽에게 메시지를 전송했다.
+- peter-test10 토픽으로 메시지를 전송하면 권한이 없어 에러가 발생할 것이다.
+
+<br/>
+
+```bash
+$ /usr/local/kafka/bin/kafka-console-consumer.sh --bootstrap-server peter-kafka01.foo.bar:9094 --topic peter-test09 --from-beginning --consumer.config kerberos.config
+```
+- peter01 유저를 이용해 콘솔 컨슈머로 peter-test09 토픽의 메시지를 읽는다.
+- 컨슈머에 대한 권한을 설정하지 않았으므로 에러가 발생할 것이다.
+
+<br/>
+
+```
+$ /usr/local/kafka/bin/kafka-acls.sh --authorizer-properties zookeeper.connect=peter-zk01.foo.bar:2181 --add --allow-principal User:peter01 --operation Read --group '*'
+```
+- 모든 컨슈머 그룹이 가능하도록 ACL 규칙을 추가한다.
+- 다시 메시지를 읽어보면 성공할 것이다.
+
+<br/>
+
+- peter02 사용자도 peter01 사용자와 같이 ACL 권한을 설정해주면 프로듀서/컨슈머를 통해 메시지를 읽고 쓸 수 있다.
+- admin 사용자는 슈퍼유저이므로 모든 권한을 갖고 있다.
+- 보안이 적용된 카프카가 꼭 필요하다면, 보안 카프카와 비보안 카프카를 분리해 운영하는 안도 구상해보는 것이 좋다.
