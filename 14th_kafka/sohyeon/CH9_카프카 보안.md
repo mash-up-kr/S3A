@@ -154,6 +154,7 @@ sudo keytool -keystore kafka.server.truststore.jks -alias CARoot -importcert -fi
 <br/>
 
 |옵션 이름|설명|
+|---|---|
 |keytool|키스토어 이름|
 |alias|별칭|
 |importcert|인증서를 임포트|
