@@ -123,6 +123,8 @@ $ keytool -list -v keystore kafka.server.keystore.jks
 
 <br/>
 
+>**실습**
+
 ```bash
 $ sudo openssl req -new -x509 -keyout ca-key -out ca-cert -days 356 -subj "/CN=foo.bar" -nodes
 ```
