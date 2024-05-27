@@ -177,3 +177,47 @@ $ keytool -list -v -keystore kafka.server.truststore.jks
 <br/>
 
 ### 9.2.4 인증서 서명
+```bash
+$ sudo keytool -keystore kafka.server.keystore.jks -alias localhost -certreq -file cert-file -storepass $SSLPASS -keypass $SSLPASS
+```
+🔼 키스토어에서 인증서 추출
+
+<br/>
+
+```bash
+$ sudo openssl x509 -req -CA ca-cert -CAkey ca-key -in cert-file -out cert-signed -days 365 -CAcreateserial -passin pass:$PASSWORD
+```
+🔼 자체 서명된 CA 서명 적용
+
+<br/>
+
+|옵션 이름|설명|
+|---|---|
+|x509|표준 인증서 번호|
+|req|인증서 서명 요청|
+|ca|인증서 파일|
+|cakey|프라이빗 키 파일|
+|in|인풋 파일|
+|out|아웃풋 파일|
+|days|유효 일자|
+|passin|소스의 프라이빗 키 비밀번호|
+
+<br/>
+
+```bash
+$ sudo keytool -keystore kafka.server.keystore.jks -alias CARoot -importcert -file ca-cert -storepass $SSLPASS -keypass $SSLPASS
+```
+🔼 키스토어에 CA 인증서와 서명된 cert-signed 추가
+
+<br/>
+
+```
+$ keytool -list -v -keystore kafka.server.keystore.jks
+```
+🔼 키스토어의 내용 확인
+- 저장소에 총 2개의 인증서가 저장되어 있으며 자체 저장된 CA 인증서 내용이 포함되어 있음을 알 수 있다.
+- 동일한 작업을 클러스터 내 다른 브로커에도 수행해야 한다.
+
+<br/>
+
+### 9.2.5 나머지 브로커에 대한 SSL 구성
