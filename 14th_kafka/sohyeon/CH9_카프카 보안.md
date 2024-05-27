@@ -117,4 +117,60 @@ $ keytool -list -v keystore kafka.server.keystore.jks
 
 <br/>
 
-### 3.2.2 CA 인증서 생성
+### 9.2.2 CA 인증서 생성
+- 공인 인증서를 사용하는 이유는 위조된 인증서를 방지해 클라이언트-서버 간 안전한 통신을 하기 위해서이며, 이러한 역할을 보장해주는 곳이 인증기관(CA)이다.
+- 일반적으로는 CA에 일부 비용을 지불하고 인증서를 발급받지만, 테스트/개발 환경에서는 자체 서명된 CA 인증서나 사설 인증서를 생성하기도 한다.
+
+<br/>
+
+```bash
+$ sudo openssl req -new -x509 -keyout ca-key -out ca-cert -days 356 -subj "/CN=foo.bar" -nodes
+```
+🔼 CA 인증서 생성
+
+<br/>
+
+|옵션 이름|설명|
+|---|---|
+|new|새로 생성 요청|
+|x509|표준 인증서 번호|
+|keyout|생성할 키 파일 이름|
+|out|생성할 인증서 파일 이름|
+|days|유효 일자|
+|subj|인증서 제목|
+|nodes|프라이빗 키 파일을 암호화하지 않음|
+
+🔼 openssl의 상세 옵션
+
+<br/>
+
+### 9.2.3 트러스트스토어 생성
+```bash
+sudo keytool -keystore kafka.server.truststore.jks -alias CARoot -importcert -file ca-cert -storepass $SSLPASS -keypass $SSLPASS
+```
+🔼 자체 서명된 CA 인증서를 트러스트스토어에 추가한다.
+- 클라이언트가 신뢰할 수 있도록 한다.
+
+<br/>
+
+|옵션 이름|설명|
+|keytool|키스토어 이름|
+|alias|별칭|
+|importcert|인증서를 임포트|
+|file|인증서 파일|
+|storepass|저장소 비밀번호|
+|keypass|키 비밀번호|
+
+🔼 트러스트 생성을 위한 keytool의 상세 옵션
+
+<br/>
+
+```bash
+$ keytool -list -v -keystore kafka.server.truststore.jks
+```
+🔼 트러스트스토어의 내용 확인
+- 인증서 생성 시 설정한 CN 정보와 유효 기간 등을 확인할 수 있다.
+
+<br/>
+
+### 9.2.4 인증서 서명
