@@ -541,7 +541,7 @@ $ /usr/local/kafka/bin/kafka-topics.sh --zookeeper peter-zk01.foo.bar:2181 --cre
 🔼 유저별 권한 설정 구성도
 - peter01 유저는 peter-test09 토픽에 대해 읽기와 쓰기 가능
 - peter02 유저는 peter-test10 토픽에 대해 읽기와 쓰기 가능
-- admin 유저는 peter-test09, peter-test10 토픽에 대해 읽기와 쓰기 가능
+- admin 유저는 peter-test09, peter-test10 토픽에 대해 읽기와 쓰기 가능
 
 <br/>
 
