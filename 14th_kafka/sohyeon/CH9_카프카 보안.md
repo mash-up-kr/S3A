@@ -221,3 +221,90 @@ $ keytool -list -v -keystore kafka.server.keystore.jks
 <br/>
 
 ### 9.2.5 나머지 브로커에 대한 SSL 구성
+2대를 동시에 설정한다.
+
+<br/>
+
+```bash
+# peter-kafka02 서버 접근 후 다음 명령어 입력
+$ sudo mkdir -p /usr/local/kafka/ssl
+$ export SSLPASS=peterpass
+
+# peter-kafka03 서버 접근 후 다음 명령어 입력
+$ sudo mkdir -p /usr/local/kafka/ssl
+$ export SSLPASS=peterpass
+```
+🔼 디렉토리를 생성하고 암호를 환경 변수로 지정
+- 해당 작업처럼 키스토어 생성, CA 인증서 생성, 트러스트스토어 생성, 인증서 서명 작업도 마찬가지로 2대에 동시에 설정한다.
+
+<br/>
+
+### 9.2.6 브로커 설정에 SSL 추가
+```
+listners=PLAINTEXT://0.0.0.0:9092,SSL://0.0.0.0:9093
+advertised.listners=PLAINTEXT://peter-kafka01.foo.bar:9092,SSL://peter-kafka01.foo.bar:9093 # 각 호스트네임과 일치하도록 변경
+
+ssl.truststore.location=/usr/local/kafka/ssl/kafka.server.truststore.jks
+ssl.truststore.password=peterpass
+ssl.keystore.location=/usr/local/kafka/ssl/kafka.server.keystore.jks
+ssl.keystore.password=peterpass
+ssl.key.password=peterpass
+security.inter.broker.protocol=SSL # 내부 브로커 통신 간 SSL을 사용할 경우
+```
+- `/usr/local/kafka/config/server.properties` 파일을 위 내용과 같이 변경한다.
+- 브로커 간의 통신은 PLAINTEXT로 설정하고 브로커-클라이언트 간의 통신은 SSL을 적용하여 암호화/복호화로 인한 오버헤드를 줄일 수 있다.
+
+<br/>
+
+```bash
+$ sudo systemctl restart kafka-server
+```
+🔼 브로커 재시작
+
+<br/>
+
+```bash
+$ openssl s_client -connect peter-kafka01.foo.bar:9093 -tls1 </dev/null 2>/dev/null | grep -E 'Verify return code'
+```
+🔼 최종 확인
+- 출력 내용에 ok 메시지가 뜨면 SSL 통신을 위한 준비가 완료된 것이다.
+
+<br/>
+
+### 9.2.7 SSL 기반 메시지 전송
+
+```bash
+$ cd /usr/local/kafka/ssl/
+$ export SSLPASS=peterpass
+$ sudo keytool -keystore kafka.client.truststore.jks -alias CARoot -importcert -file ca-cert -storepass $SSLPASS -keypass $SSLPASS
+```
+🔼 브로커 접속 후 클라이언트용 트러스트스토어 생성
+- 상세 과정은 앞의 트러스트스토어 생성 작업과 동일하다.
+
+<br/>
+
+```bash
+$ /usr/local/kafka/bin/kafka-topics.sh --bootstrap-server peter-kafka01.foo.bar:9092 --create --topic peter-test07 --partitions 1 --replication-factor 3
+```
+🔼 토픽 생성
+- 전송 테스트를 위함이다.
+
+<br/>
+
+```
+security.protocol=SSL
+ssl.truststore.location=/usr/local/kafka/ssl/kafka.client.truststore.jks
+ssl.truststore.password=peterpass
+```
+🔼 SSL 통신을 위한 ssl.config
+- ssl.config 파일을 만들고 위의 내용을 추가한다.
+
+<br/>
+
+- 프로듀서가 메시지를 전송하면 컨슈머가 메시지를 정확하게 읽어올 수 있다.
+- 외부 네트워크에 있는 클라이언트가 내부 네트워크에 있는 카프카로 접근하는 경우에만 SSL 작업을 수행하기가 권장된다.
+- 보안을 강화하면 브로커와 클라이언트의 성능 저하가 발생할 수도 있다.
+
+<br/>
+
+## 9.3 커버로스(SASL)를 이용한 카프카 인증
