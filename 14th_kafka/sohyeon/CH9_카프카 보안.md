@@ -55,3 +55,66 @@
 <br/>
 
 ## 9.2 SSL을 이용한 카프카 암호화
+
+<img alt="image" width="500" src="https://github.com/mash-up-kr/S3A/assets/55437339/6a6f9de9-b14e-4ab1-b69f-693c3186e356"/>
+
+🔼 카프카 SSL 적용 개요 (클러스터 환경 기준)
+
+<br/>
+
+### 9.2.1 브로커 키스토어 생성
+
+<img alt="image" width="500" src="https://github.com/mash-up-kr/S3A/assets/55437339/5fc8d6e2-1645-407f-804b-0a152e502bbe"/>
+
+🔼 키스토어와 트러스트스토어의 관계도
+- 클라이언트와 서버 사이에 자바 애플리케이션을 이용해 SSL 연결을 할 때 사용한다.
+- 키스토어와 트러스트스토어 모두 keytool을 이용해 관리되며, 각 스토어에 저장되는 내용은 차이가 있다.
+  - **키스토어**: 서버 측면에서 프라이빗 키와 인증서를 저장하며, 자격 증명을 제공한다.
+  - **트러스트스토어**: 클라이언트 측면에서 서버가 제공하는 인증서를 검증하기 위한 퍼블릭 키와 SSL 연결에서 유효성을 검사하는 서명된 인증서를 저장한다. (민감한 정보X)
+ 
+<br/>
+
+> **실습**
+
+```bash
+$ sudo mkdir -p /usr/local/kafka/ssl # ssl 디렉토리 생성 (필요한 파일들을 모아두기 위함)
+$ cd /usr/local/kafka/ssl/ # 디렉토리 진입
+$ export SSLPASS=peterpass # 비밀번호 통일 (for 테스트 환경)
+```
+🔼 디렉토리 생성
+
+<br/>
+
+```bash
+sudo keytool -keystore kafka.server.keystore.jks -alias localhost -keyalg RSA -validity 365 -genkey -storepass $SSLPASS -keypass $SSLPASS -dname "CN=peter-kafka01.foo.bar" -storetype pkcs12
+```
+🔼 키스토어 생성
+
+<br/>
+
+|옵션 이름|설명|
+|---|---|
+|keystore|키스토어 이름|
+|alias|별칭|
+|keyalg|키 알고리즘|
+|genkey|키 생성|
+|validity|유효 일자|
+|storepass|저장소 비밀번호|
+|keypass|키 비밀번호|
+|dname|식별 이름|
+|storetype|저장 타입|
+
+🔼 keytool의 상세 옵션
+
+<br/>
+
+```bash
+$ keytool -list -v keystore kafka.server.keystore.jks
+키 저장소 비밀번호 입력: peterpass
+```
+🔼 키스토어의 내용 확인
+- 출력 내용을 통해 옵션으로 설정한 저장소 유형, 유효 기간, 알고리즘, 소유자, 발행자 등에서 설정한 내용들을 확인할 수 있다.
+
+<br/>
+
+### 3.2.2 CA 인증서 생성
