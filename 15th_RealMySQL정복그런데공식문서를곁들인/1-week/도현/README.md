@@ -1,1 +1,1 @@
-https://k-diger.github.io/
+https://k-diger.github.io/posts/RealMySQLWithOfficialDocument1/
