@@ -159,6 +159,7 @@ https://docs.micrometer.io/micrometer/reference/overview.html
   com.sun.management.HotSpotDiagnosticMXBean
 
   <br/>
+  
   ```
   protected static class HotSpotDiagnosticMXBeanHeapDumper implements HeapDumper {
   
