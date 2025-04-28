@@ -196,7 +196,7 @@ https://docs.micrometer.io/micrometer/reference/overview.html
   			return file;
   		}
   
-  	}
+  }
   ```
 
   - 질문은 아니지만 갑자기 생각난 썰
