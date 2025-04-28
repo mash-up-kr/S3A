@@ -89,15 +89,14 @@
     - 이원영: 김경환이 걸릴 것 같음 ㅋㅋ
 - 오전 9시 시작??? ㅎㅎ → 유지
 
-![image.png](attachment:2e7af58e-8aac-4605-9c42-94d123474706:image.png)
+<img width="541" alt="image" src="https://github.com/user-attachments/assets/68bc270c-a007-4f59-af4e-0fdbd241a564" />
 
-## 다음 이시간에
 
-![image.png](attachment:9f983505-2a3c-45a9-a685-ff17019a1cde:image.png)
+<br/>
 
-https://github.com/spring-projects/spring-framework/issues/4828
+## Next Week
 
-### 분량
+### Goal
 
 **Java-based Configuration vs Annotation-based Configuration 둘의 차이를 생각하면서 읽기**
 
@@ -110,6 +109,7 @@ https://github.com/spring-projects/spring-framework/issues/4828
 - https://docs.spring.io/spring-framework/reference/core/beans/annotation-config/custom-autowire-configurer.html
 - https://docs.spring.io/spring-framework/reference/core/beans/annotation-config/resource.html
 
-### 코드
+<br/>
 
-- AbstractAutowireCapableBeanFactory#initializeBean
+### Code
+AbstractAutowireCapableBeanFactory#initializeBean
