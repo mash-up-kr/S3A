@@ -43,9 +43,13 @@ Spring은 org.springframework.core.io.Resource 인터페이스를 통해 리소�
 
 
 - spring context 초기화 시 protocolresolver load
+
+
   <img width="523" alt="image" src="https://github.com/user-attachments/assets/af461cc1-cce1-42be-ac71-dbb4da3bd79d" />
 
 - default 는 base64 protocol resolver
+
+
   <img width="674" alt="image" src="https://github.com/user-attachments/assets/963d0412-a9bc-4001-8f5b-2dfd7995a661" />
 
 
@@ -137,6 +141,8 @@ class MyCustomBean : ApplicationContextAware {
 
         
     - `FileSystemXmlApplicationContext`
+ 
+
       <img width="490" alt="image" src="https://github.com/user-attachments/assets/2029430b-8c5e-455a-a9e1-d3c40e5c1536" />
 
         
