@@ -92,7 +92,7 @@
 <img width="541" alt="image" src="https://github.com/user-attachments/assets/68bc270c-a007-4f59-af4e-0fdbd241a564" />
 
 
-<br/>
+<br/><br/>
 
 ## Next Week
 
