@@ -25,3 +25,7 @@ https://docs.spring.io/spring-framework/reference/core.html
 - 스프링의 철학과 설계를 이해하기
   - 모든 스프링 컴포넌트를 알 수는 없음
   - 철학을 이해하면 모르는 컴포넌트가 있더라도 용도 혹은 사용법을 유추 가능
+
+<br/>
+
+![image](https://github.com/user-attachments/assets/07dd4c2b-e5be-4eca-abe3-98262a8545c7)
