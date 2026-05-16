@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./gradlew compileJava)",
+      "Bash(./gradlew bootRun *)",
+      "Bash(curl *)",
+      "Bash(git remote *)",
+      "Bash(ssh -T -o StrictHostKeyChecking=accept-new git@github.com)",
+      "Bash(git config *)",
+      "Bash(git push *)"
+    ]
+  }
+}
