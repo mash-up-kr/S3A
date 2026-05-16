@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>다마고치 선택</title>
+    <link rel="stylesheet" th:href="@{/css/select.css}">
+</head>
+<body>
+    <h1>함께할 펫을 선택하세요</h1>
+    <div class="grid">
+        <div class="card"
+             th:each="name : ${images}"
+             th:data-name="${#strings.substringBefore(name, '.')}"
+             th:data-src="@{/images/pet/{file}(file=${name})}">
+            <img th:src="@{/images/pet/{file}(file=${name})}" th:alt="${name}">
+            <p th:text="${#strings.substringBefore(name, '.')}"></p>
+        </div>
+    </div>
+
+    <div id="modal" class="modal-backdrop hidden">
+        <div class="modal">
+            <img id="modal-image" alt="">
+            <p id="modal-message"></p>
+            <label for="pet-name">다마고치 이름</label>
+            <input id="pet-name" type="text" maxlength="20" placeholder="이름을 지어주세요">
+            <div class="modal-actions">
+                <button type="button" id="modal-yes" class="primary">예</button>
+                <button type="button" id="modal-no" class="ghost">아니오</button>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        (function () {
+            const modal = document.getElementById('modal');
+            const modalImage = document.getElementById('modal-image');
+            const modalMessage = document.getElementById('modal-message');
+
+            const petNameInput = document.getElementById('pet-name');
+
+            function openModal(name, src) {
+                modalImage.src = src;
+                modalImage.alt = name;
+                modalMessage.textContent = name + '(으)로 하시겠습니까?';
+                petNameInput.value = '';
+                modal.classList.remove('hidden');
+                petNameInput.focus();
+            }
+
+            function closeModal() {
+                modal.classList.add('hidden');
+            }
+
+            document.querySelectorAll('.card').forEach(card => {
+                card.addEventListener('click', () => {
+                    openModal(card.dataset.name, card.dataset.src);
+                });
+            });
+
+            document.getElementById('modal-yes').addEventListener('click', () => {
+                const petName = petNameInput.value.trim();
+                if (!petName) {
+                    petNameInput.focus();
+                    return;
+                }
+                window.location.href = /*[[@{/login}]]*/ '/login';
+            });
+            document.getElementById('modal-no').addEventListener('click', closeModal);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeModal();
+            });
+        })();
+    </script>
+</body>
+</html>

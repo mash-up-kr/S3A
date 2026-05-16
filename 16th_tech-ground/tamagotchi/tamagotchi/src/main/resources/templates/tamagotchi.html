@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>다마고치</title>
+    <link rel="stylesheet" th:href="@{/css/tamagotchi.css}">
+</head>
+<body>
+    <div class="room">
+        <img th:src="@{/images/room/{file}(file='tamagotchi_device.png')}" alt="다마고치 방">
+    </div>
+</body>
+</html>
