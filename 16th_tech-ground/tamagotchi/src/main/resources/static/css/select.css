@@ -1,13 +1,24 @@
-body {
-    font-family: sans-serif;
-    background: #fafafa;
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap');
+
+* {
+    box-sizing: border-box;
     margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #fce4ec 0%, #ffd1c1 50%, #d1e8ff 100%);
     padding: 40px;
 }
 
 h1 {
     text-align: center;
     color: #333;
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 12px;
 }
 
 .grid {
@@ -19,17 +30,18 @@ h1 {
 }
 
 .card {
-    background: white;
-    border-radius: 16px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    padding: 16px;
+    background: #ffffff;
+    border-radius: 24px;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12);
+    padding: 24px;
     text-align: center;
     cursor: pointer;
-    transition: transform 0.15s;
+    transition: transform 0.15s, box-shadow 0.15s;
 }
 
 .card:hover {
     transform: translateY(-4px);
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.16);
 }
 
 .card img {
@@ -39,8 +51,9 @@ h1 {
 }
 
 .card p {
-    margin: 12px 0 0;
-    font-size: 18px;
+    margin: 16px 0 0;
+    font-size: 16px;
+    font-weight: 500;
     color: #555;
 }
 
@@ -59,12 +72,12 @@ h1 {
 }
 
 .modal {
-    background: white;
-    border-radius: 16px;
+    background: #ffffff;
+    border-radius: 24px;
     padding: 32px;
     width: 320px;
     text-align: center;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12);
 }
 
 .modal img {
@@ -74,8 +87,9 @@ h1 {
 }
 
 .modal p {
-    margin: 20px 0 16px;
-    font-size: 17px;
+    margin: 20px 0 20px;
+    font-size: 16px;
+    font-weight: 500;
     color: #333;
 }
 
@@ -83,23 +97,28 @@ h1 {
     display: block;
     text-align: left;
     font-size: 13px;
-    color: #666;
-    margin-bottom: 6px;
+    font-weight: 700;
+    color: #555;
+    margin-bottom: 8px;
 }
 
 .modal input {
     width: 100%;
-    padding: 10px 12px;
-    margin-bottom: 20px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 24px;
+    border: 2px solid #e8e8e8;
+    border-radius: 12px;
     font-size: 14px;
+    font-family: inherit;
     box-sizing: border-box;
+    background: #fafafa;
+    transition: border-color 0.2s;
 }
 
 .modal input:focus {
     outline: none;
-    border-color: #4a90e2;
+    border-color: #ffab91;
+    background: #fff;
 }
 
 .modal-actions {
@@ -110,27 +129,36 @@ h1 {
 .modal-actions button {
     flex: 1;
     padding: 12px;
-    border-radius: 8px;
+    border-radius: 12px;
     font-size: 15px;
+    font-weight: 700;
     cursor: pointer;
     border: none;
+    font-family: inherit;
+    transition: transform 0.15s, box-shadow 0.15s;
 }
 
 .modal-actions .primary {
-    background: #4a90e2;
-    color: white;
+    background: linear-gradient(90deg, #ffab91, #ff8a65);
+    color: #fff;
 }
 
 .modal-actions .primary:hover {
-    background: #3a7bc8;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 138, 101, 0.4);
+}
+
+.modal-actions .primary:active {
+    transform: translateY(0);
 }
 
 .modal-actions .ghost {
-    background: white;
-    color: #4a90e2;
-    border: 1px solid #4a90e2;
+    background: #ffffff;
+    color: #ffab91;
+    border: 2px solid #ffab91;
 }
 
 .modal-actions .ghost:hover {
-    background: #f0f6fd;
+    background: #fff5f1;
+    transform: translateY(-2px);
 }

@@ -7,7 +7,15 @@
 </head>
 <body>
     <div class="room">
-        <img th:src="@{/images/room/{file}(file='tamagotchi_device.png')}" alt="다마고치 방">
+        <div class="device-wrapper">
+            <img class="device-img" th:src="@{/images/room/{file}(file='tamagotchi_device.png')}" alt="다마고치">
+            <div class="pet-area" th:if="${character}">
+                <img class="pet-img"
+                     th:src="@{/images/pet/{file}(file=${character + '.png'})}"
+                     th:alt="${petName}">
+                <p class="pet-name" th:text="${petName}"></p>
+            </div>
+        </div>
     </div>
 </body>
 </html>

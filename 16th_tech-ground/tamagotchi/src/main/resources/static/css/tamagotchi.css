@@ -1,5 +1,12 @@
-html, body {
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap');
+
+* {
+    box-sizing: border-box;
     margin: 0;
+    padding: 0;
+}
+
+html, body {
     height: 100%;
     overflow: hidden;
     background: white;
@@ -9,6 +16,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    font-family: 'Noto Sans KR', sans-serif;
 }
 
 .room {
@@ -19,9 +27,34 @@ body {
     justify-content: center;
 }
 
-.room img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
+.device-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.device-img {
+    max-height: 90vh;
+    width: auto;
     display: block;
+}
+
+.pet-area {
+    position: absolute;
+    top: 18%;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+}
+
+.pet-img {
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+}
+
+.pet-name {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 14px;
+    color: #555;
+    margin-top: 4px;
 }
