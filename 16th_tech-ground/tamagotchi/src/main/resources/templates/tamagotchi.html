@@ -11,7 +11,7 @@
         <div class="pet-area" th:if="${character}">
             <p class="pet-name" th:text="${petName}"></p>
             <img class="pet-img"
-                 th:src="@{/images/pet/{file}(file=${character + '.png'})}"
+                 th:src="|/images/pet/${character}.png|"
                  th:alt="${petName}">
         </div>
     </div>
