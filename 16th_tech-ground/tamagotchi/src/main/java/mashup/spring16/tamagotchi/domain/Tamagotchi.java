@@ -24,7 +24,7 @@ public class Tamagotchi {
     private Member member;
 
     @NonNull
-    @Column(nullable = false)
+    @Column(name = "pet_character", nullable = false)
     private String character;
 
     @NonNull
