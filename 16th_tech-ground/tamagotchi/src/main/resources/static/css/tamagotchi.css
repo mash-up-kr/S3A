@@ -1,27 +1,65 @@
-html, body {
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap');
+
+* {
+    box-sizing: border-box;
     margin: 0;
+    padding: 0;
+}
+
+html, body {
+    width: 100%;
     height: 100%;
     overflow: hidden;
-    background: white;
+    background: linear-gradient(135deg, #fce4ec 0%, #ffd1c1 50%, #d1e8ff 100%);
 }
 
 body {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    font-family: 'Noto Sans KR', sans-serif;
 }
 
 .room {
+    position: relative;
     width: 100vw;
     height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
-.room img {
-    max-width: 100%;
-    max-height: 100%;
+.room-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
     object-fit: contain;
-    display: block;
+    object-position: center;
+}
+
+.pet-area {
+    position: absolute;
+    bottom: 30%;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.pet-img {
+    width: 180px;
+    height: 180px;
+    object-fit: contain;
+}
+
+.pet-name {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(4px);
+    border-radius: 20px;
+    padding: 5px 16px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #555;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    white-space: nowrap;
 }

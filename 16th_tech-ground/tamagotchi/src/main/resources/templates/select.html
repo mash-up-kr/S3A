@@ -38,7 +38,10 @@
 
             const petNameInput = document.getElementById('pet-name');
 
+            let selectedCharacter = '';
+
             function openModal(name, src) {
+                selectedCharacter = name;
                 modalImage.src = src;
                 modalImage.alt = name;
                 modalMessage.textContent = name + '(으)로 하시겠습니까?';
@@ -63,7 +66,24 @@
                     petNameInput.focus();
                     return;
                 }
-                window.location.href = /*[[@{/login}]]*/ '/login';
+                const form = document.createElement('form');
+                form.method = 'post';
+                form.action = /*[[@{/signup/select}]]*/ '/signup/select';
+
+                const charInput = document.createElement('input');
+                charInput.type = 'hidden';
+                charInput.name = 'character';
+                charInput.value = selectedCharacter;
+
+                const nameInput = document.createElement('input');
+                nameInput.type = 'hidden';
+                nameInput.name = 'name';
+                nameInput.value = petName;
+
+                form.appendChild(charInput);
+                form.appendChild(nameInput);
+                document.body.appendChild(form);
+                form.submit();
             });
             document.getElementById('modal-no').addEventListener('click', closeModal);
             modal.addEventListener('click', (e) => {
