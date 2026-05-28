@@ -8,14 +8,15 @@
 <body>
     <form class="card" method="post" th:action="@{/signup}">
         <h1>회원가입</h1>
+        <p class="error" th:if="${error}" th:text="${error}"></p>
         <label for="username">아이디</label>
         <input id="username" name="username" type="text" required autofocus>
         <label for="password">비밀번호</label>
         <input id="password" name="password" type="password" required>
         <label for="passwordConfirm">비밀번호 확인</label>
         <input id="passwordConfirm" name="passwordConfirm" type="password" required>
-        <button type="submit">펫 고르러가기</button>
-        <a class="login-link" th:href="@{/login}">로그인으로 돌아가기</a>
+        <button type="submit">펫 고르러 가기</button>
+        <a class="login-link" th:href="@{/login}">이미 계정이 있으신가요? 로그인</a>
     </form>
 </body>
 </html>

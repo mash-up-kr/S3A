@@ -1,75 +1,106 @@
-body {
-    font-family: sans-serif;
-    background: #fafafa;
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap');
+
+* {
+    box-sizing: border-box;
     margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 100vh;
+    background: linear-gradient(135deg, #fce4ec 0%, #ffd1c1 50%, #d1e8ff 100%);
 }
 
 .card {
-    background: white;
-    border-radius: 16px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-    padding: 40px 48px;
-    width: 320px;
+    background: #ffffff;
+    border-radius: 24px;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12);
+    padding: 48px 44px;
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
-h1 {
-    margin: 0 0 24px;
+.card h1 {
+    font-size: 26px;
+    font-weight: 700;
     text-align: center;
     color: #333;
-    font-size: 22px;
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
 }
 
 label {
-    display: block;
     font-size: 13px;
-    color: #666;
-    margin-bottom: 6px;
+    font-weight: 700;
+    color: #555;
 }
 
-input {
+input[type="text"],
+input[type="password"] {
     width: 100%;
-    padding: 10px 12px;
-    margin-bottom: 16px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 14px;
-    box-sizing: border-box;
-}
-
-input:focus {
-    outline: none;
-    border-color: #888;
-}
-
-button {
-    width: 100%;
-    padding: 12px;
-    background: #4a90e2;
-    color: white;
-    border: none;
-    border-radius: 8px;
+    padding: 12px 16px;
+    border: 2px solid #e8e8e8;
+    border-radius: 12px;
     font-size: 15px;
-    cursor: pointer;
+    font-family: inherit;
+    transition: border-color 0.2s;
+    outline: none;
+    background: #fafafa;
 }
 
-button:hover {
-    background: #3a7bc8;
+input[type="text"]:focus,
+input[type="password"]:focus {
+    border-color: #ffab91;
+    background: #fff;
+}
+
+.error {
+    font-size: 13px;
+    color: #e53935;
+    text-align: center;
+    min-height: 18px;
+}
+
+button[type="submit"] {
+    margin-top: 6px;
+    padding: 14px;
+    background: linear-gradient(90deg, #ffab91, #ff8a65);
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    font-family: inherit;
+    color: #fff;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    letter-spacing: -0.3px;
+}
+
+button[type="submit"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 138, 101, 0.4);
+}
+
+button[type="submit"]:active {
+    transform: translateY(0);
 }
 
 .login-link {
     display: block;
-    margin-top: 16px;
     text-align: center;
     font-size: 13px;
-    color: #888;
+    color: #aaa;
     text-decoration: none;
+    margin-top: 4px;
 }
 
 .login-link:hover {
-    color: #4a90e2;
-    text-decoration: underline;
+    color: #ff8a65;
 }
