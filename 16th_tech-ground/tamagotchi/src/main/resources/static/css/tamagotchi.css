@@ -33,7 +33,7 @@ body {
 
 .pet-area {
     position: absolute;
-    bottom: 50%;
+    bottom: 42%;
     left: 50%;
     transform: translateX(-50%);
     text-align: center;
