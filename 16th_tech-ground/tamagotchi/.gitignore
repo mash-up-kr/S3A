@@ -38,3 +38,5 @@ out/
 
 ### Claude ###
 .claude/settings.local.json
+.claude/
+docs/
