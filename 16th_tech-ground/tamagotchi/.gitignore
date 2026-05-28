@@ -40,3 +40,6 @@ out/
 .claude/settings.local.json
 .claude/
 docs/
+
+### Local config ###
+src/main/resources/application-local.properties
