@@ -9,10 +9,10 @@
     <div class="room">
         <img class="room-bg" th:src="@{/images/room/{file}(file='tamagotchi_device.png')}" alt="다마고치 방">
         <div class="pet-area" th:if="${character}">
+            <p class="pet-name" th:text="${petName}"></p>
             <img class="pet-img"
                  th:src="@{/images/pet/{file}(file=${character + '.png'})}"
                  th:alt="${petName}">
-            <p class="pet-name" th:text="${petName}"></p>
         </div>
     </div>
 </body>
