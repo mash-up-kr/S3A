@@ -1,35 +1,33 @@
 package mashup.spring16.tamagotchi.domain;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 @Entity
 @Table(name = "tamagotchi")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@RequiredArgsConstructor
 public class Tamagotchi {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NonNull
     @OneToOne
     @JoinColumn(name = "member_id", unique = true, nullable = false)
     private Member member;
 
+    @NonNull
     @Column(nullable = false)
     private String character;
 
+    @NonNull
     @Column(nullable = false)
     private String name;
-
-    protected Tamagotchi() {}
-
-    public Tamagotchi(Member member, String character, String name) {
-        this.member = member;
-        this.character = character;
-        this.name = name;
-    }
-
-    public Long getId() { return id; }
-    public Member getMember() { return member; }
-    public String getCharacter() { return character; }
-    public String getName() { return name; }
 }
