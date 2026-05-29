@@ -8,11 +8,56 @@
 <body>
     <div class="room">
         <img class="room-bg" th:src="@{/images/room/{file}(file='tamagotchi_device.png')}" alt="다마고치 방">
+
         <div class="pet-area" th:if="${character}">
+            <div class="hungry-bubble" th:if="${hunger == 0}">배고파요 😢</div>
             <p class="pet-name" th:text="${petName}"></p>
             <img class="pet-img"
+                 th:classappend="${hunger == 0} ? ' sad' : ''"
                  th:src="|/images/pet/${character}.png|"
                  th:alt="${petName}">
+        </div>
+
+        <div class="stats-panel">
+            <div class="stat-row">
+                <span class="stat-label">Lv.</span>
+                <span class="level-badge" th:text="${level}"></span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">허기</span>
+                <div class="bar-wrap">
+                    <div class="bar hunger-bar"
+                         th:classappend="${hunger >= 60} ? ' full' : (${hunger >= 30} ? ' mid' : ' low')"
+                         th:style="'width:' + ${hunger} + '%'"></div>
+                </div>
+                <span class="stat-value" th:text="${hunger} + '/100'"></span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">EXP</span>
+                <div class="bar-wrap">
+                    <div class="bar exp-bar"
+                         th:style="${expForNextLevel > 0} ? 'width:' + (${experience * 100 / expForNextLevel}) + '%' : 'width:100%'"></div>
+                </div>
+                <span class="stat-value" th:text="${experience} + '/' + ${expForNextLevel}"></span>
+            </div>
+        </div>
+
+        <button class="hook-btn" onclick="document.getElementById('hook-modal').classList.toggle('hidden')">⚙ 훅 설정</button>
+        <div id="hook-modal" class="hook-modal hidden">
+            <p><b>1.</b> 아래 API 토큰을 복사하세요</p>
+            <code class="api-token" th:text="${apiToken}"></code>
+            <p><b>2.</b> <code>~/.claude/settings.json</code> 에 추가</p>
+            <pre class="hook-config">{
+  "hooks": {
+    "Stop": [{
+      "matcher": "",
+      "hooks": [{
+        "type": "command",
+        "command": "<span th:text="'TAMAGOTCHI_API_TOKEN=' + ${apiToken} + ' python3 /Users/yeonkyungryu/study/mashup-study/S3A/16th_tech-ground/tamagotchi/scripts/hook_feed.py'"></span>"
+      }]
+    }]
+  }
+}</pre>
         </div>
     </div>
 </body>

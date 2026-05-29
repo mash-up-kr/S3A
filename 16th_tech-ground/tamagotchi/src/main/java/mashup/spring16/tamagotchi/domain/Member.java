@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "member")
 @Getter
@@ -25,4 +27,14 @@ public class Member {
     @NonNull
     @Column(nullable = false)
     private String password;
+
+    @Column(name = "api_token", unique = true, nullable = false)
+    private String apiToken;
+
+    @PrePersist
+    private void generateApiToken() {
+        if (apiToken == null) {
+            apiToken = UUID.randomUUID().toString();
+        }
+    }
 }

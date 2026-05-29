@@ -2,7 +2,9 @@ package mashup.spring16.tamagotchi.controller;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import mashup.spring16.tamagotchi.domain.Member;
 import mashup.spring16.tamagotchi.domain.Tamagotchi;
+import mashup.spring16.tamagotchi.repository.MemberRepository;
 import mashup.spring16.tamagotchi.repository.TamagotchiRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,6 +17,7 @@ import java.util.Optional;
 public class TamagotchiController {
 
     private final TamagotchiRepository tamagotchiRepository;
+    private final MemberRepository memberRepository;
 
     @GetMapping("/tamagotchi")
     public String tamagotchi(HttpSession session, Model model) {
@@ -25,12 +28,20 @@ public class TamagotchiController {
 
         Optional<Tamagotchi> tamagotchi = tamagotchiRepository.findByMemberId(memberId);
         if (tamagotchi.isEmpty()) {
-            // 다마고치 없는 경우 캐릭터 선택으로 이동 (session의 memberId는 유지)
             return "redirect:/signup/select";
         }
 
-        model.addAttribute("character", tamagotchi.get().getCharacter());
-        model.addAttribute("petName", tamagotchi.get().getName());
+        Tamagotchi pet = tamagotchi.get();
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalStateException("회원을 찾을 수 없습니다."));
+
+        model.addAttribute("character", pet.getCharacter());
+        model.addAttribute("petName", pet.getName());
+        model.addAttribute("level", pet.getLevel());
+        model.addAttribute("hunger", pet.computeCurrentHunger());
+        model.addAttribute("experience", pet.getExperience());
+        model.addAttribute("expForNextLevel", pet.expForNextLevel());
+        model.addAttribute("apiToken", member.getApiToken());
         return "tamagotchi";
     }
 }

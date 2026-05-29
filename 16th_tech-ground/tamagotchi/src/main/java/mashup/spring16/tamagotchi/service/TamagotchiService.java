@@ -22,4 +22,13 @@ public class TamagotchiService {
                 .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
         return tamagotchiRepository.save(new Tamagotchi(member, request.character(), request.name()));
     }
+
+    @Transactional
+    public void feed(String apiToken, long inputTokens, long outputTokens) {
+        Member member = memberRepository.findByApiToken(apiToken)
+                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 API 토큰입니다."));
+        Tamagotchi tamagotchi = tamagotchiRepository.findByMemberId(member.getId())
+                .orElseThrow(() -> new IllegalArgumentException("다마고치를 찾을 수 없습니다."));
+        tamagotchi.feed(inputTokens, outputTokens);
+    }
 }
